@@ -1,0 +1,40 @@
+{
+  "name": "yy-fe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuemenglong/yy-fe.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yuemenglong/yy-fe/issues"
+  },
+  "homepage": "https://github.com/yuemenglong/yy-fe#readme",
+  "dependencies": {
+    "babel-preset-react": "^6.23.0",
+    "browserify": "^14.1.0",
+    "del": "^2.2.2",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "gulp-add-src": "^0.2.0",
+    "gulp-babel": "^6.1.2",
+    "gulp-jade-jsx": "^1.0.10",
+    "gulp-rename": "^1.2.2",
+    "lodash": "^4.17.4",
+    "merge-stream": "^1.0.1",
+    "react": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "through2": "^2.0.3",
+    "vinyl-buffer": "^1.0.0",
+    "vinyl-paths": "^2.1.0",
+    "vinyl-source-stream": "^1.1.0",
+    "watchify": "^3.9.0",
+    "yy-build": "^1.0.6",
+    "yy-fs": "^1.0.0"
+  }
+}
