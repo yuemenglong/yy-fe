@@ -56,6 +56,11 @@ module.exports = function(dirname, requireMap) {
         return [pre, last].join(to);
     }
 
+    function clearSrc(path) {
+        var arr = path.split("src/");
+        return _.nth(arr, -1);
+    }
+
     function getApps() {
         function getAppPath(path) {
             var subApps = fs.readdirSync(path).map(function(name) {
@@ -112,16 +117,19 @@ module.exports = function(dirname, requireMap) {
         var lessTasks = [];
         var jadeTasks = [];
         var packTasks = apps.map(function(name) {
+            var appName = clearSrc(name);
             var src = replaceSrc(`${name}/bundle.js`, "build");
             var dest = replaceSrc(name, "bundle");
             var b = browserify(src);
             var build = new Build.Browserify(b);
-            var jp = new JadePlugin(requireMap, name, `${name}.jade`);
+            var jp = new JadePlugin(requireMap, appName, `${appName}.jade`);
             var lp = new LessPlugin("bundle.css");
             build.plugin(jp);
             build.plugin(lp);
-            var jadeTask = jp.pipe(gulp.dest(replaceSrc(name, "jade")));
-            var lessTask = lp.pipe(gulp.dest(replaceSrc(name, "bundle")));
+            var jadeDest = P.resolve(dirname, "jade");
+            var bundleDest = P.resolve(dirname, "bundle");
+            var jadeTask = jp.pipe(gulp.dest(jadeDest));
+            var lessTask = lp.pipe(gulp.dest(bundleDest));
             jadeTasks.push(jadeTask);
             lessTasks.push(lessTask);
             return b.bundle()
@@ -140,6 +148,10 @@ module.exports = function(dirname, requireMap) {
 
     function clean(done) {
         // return gulp.src(resolve("build")).pipe(path(del));
+        console.log(`Clean ${resolve("build")}`);
+        console.log(`Clean ${resolve("bundle")}`);
+        console.log(`Clean ${resolve("jade")}`);
+        console.log(`Clean ${resolve("dist")}`);
         fs.unlinkSync(resolve("build"));
         fs.unlinkSync(resolve("bundle"));
         fs.unlinkSync(resolve("jade"));

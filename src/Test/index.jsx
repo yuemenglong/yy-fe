@@ -1,3 +1,9 @@
 var React = require("react");
 
-module.exports = jade(`h1 hello world`);
+function Test() {
+    this.render = function() {
+        return jade(`h1 hello world`);
+    }
+}
+
+module.exports = React.createClass(new Test());
