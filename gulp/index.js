@@ -33,6 +33,8 @@ var defaultMap = {
     "lodash": "//cdn.bootcss.com/lodash.js/4.12.0/lodash.min.js",
     "bluebird": "//cdn.bootcss.com/bluebird/3.3.5/bluebird.min.js",
     "moment": "//cdn.bootcss.com/moment.js/2.13.0/moment.min.js",
+    "yy-fe/App": null,
+    "yy-fe/ev": null,
     "events": null,
 }
 
