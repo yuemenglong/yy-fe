@@ -1,9 +1,13 @@
 var React = require("react");
+var App = require("../../App/index");
+var ev = require("../../ev");
+require("./style.less");
 
-function Test() {
+function TestClass() {
     this.render = function() {
         return jade(`h1 hello world!`);
     }
 }
 
-module.exports = React.createClass(new Test());
+var Test = React.createClass(new TestClass())
+module.exports = App.createApp(Test);

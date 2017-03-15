@@ -19,7 +19,7 @@ var rename = require("gulp-rename");
 var addsrc = require('gulp-add-src');
 var merge = require('merge-stream');
 
-var Build = require("yy-build");
+var Build = require("./build");
 var DebugPlugin = Build.DebugPlugin;
 var ExcludePlugin = Build.ExcludePlugin;
 var ImgPlugin = Build.ImgPlugin;
@@ -33,6 +33,7 @@ var defaultMap = {
     "lodash": "//cdn.bootcss.com/lodash.js/4.12.0/lodash.min.js",
     "bluebird": "//cdn.bootcss.com/bluebird/3.3.5/bluebird.min.js",
     "moment": "//cdn.bootcss.com/moment.js/2.13.0/moment.min.js",
+    "events": null,
 }
 
 function errorHandler(err) {
@@ -127,7 +128,7 @@ module.exports = function(dirname, requireMap) {
             build.plugin(jp);
             build.plugin(lp);
             var jadeDest = resolve("jade");
-            var bundleDest = resolve("bundle");
+            var bundleDest = resolve("bundle") + "/" + appName;
             var jadeTask = jp.pipe(gulp.dest(jadeDest));
             var lessTask = lp.pipe(gulp.dest(bundleDest));
             jadeTasks.push(jadeTask);
