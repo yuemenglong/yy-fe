@@ -2,7 +2,7 @@ var React = require("react");
 
 function Test() {
     this.render = function() {
-        return jade(`h1 hello world`);
+        return jade(`h1 hello world!`);
     }
 }
 

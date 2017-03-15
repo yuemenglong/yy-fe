@@ -126,8 +126,8 @@ module.exports = function(dirname, requireMap) {
             var lp = new LessPlugin("bundle.css");
             build.plugin(jp);
             build.plugin(lp);
-            var jadeDest = P.resolve(dirname, "jade");
-            var bundleDest = P.resolve(dirname, "bundle");
+            var jadeDest = resolve("jade");
+            var bundleDest = resolve("bundle");
             var jadeTask = jp.pipe(gulp.dest(jadeDest));
             var lessTask = lp.pipe(gulp.dest(bundleDest));
             jadeTasks.push(jadeTask);
@@ -187,13 +187,16 @@ module.exports = function(dirname, requireMap) {
 
     function watchSrc(done) {
         var app = process.argv.slice(-1)[0].slice(2);
-        var watcher = gulp.watch(["src/**/*.jsx", "src/**/*.js", "src/**/*.json"]);
+        var watcher = gulp.watch([resolve("src/**/*.jsx"), resolve("src/**/*.js"), resolve("src/**/*.json")]);
         watcher.on("change", function(path) {
             var build = new Build();
             build.plugin(new PathPlugin(dirname));
             build.plugin(new ImgPlugin());
-            var output = P.resolve(dirname, P.dirname(path).replace(/^src/, "build"));
-            path = P.resolve(dirname, path);
+            var output = P.dirname(replaceSrc(path, "build"));
+            // console.log(path, output);
+            // return;
+            // var output = P.resolve(dirname, P.dirname(path).replace(/^src/, "build"));
+            // path = P.resolve(dirname, path);
             console.log(`[${timeString()}] File Change: [${path}]`);
             console.log(`[${timeString()}] Build Output: [${output}]`);
             if (P.extname(path) == ".jsx") {
@@ -218,7 +221,7 @@ module.exports = function(dirname, requireMap) {
 
     function watchBuild(done) {
         var app = process.argv.slice(-1)[0].slice(2);
-        var b = browserify(`build/${app}/bundle.js`, { cache: {}, packageCache: {} });
+        var b = browserify(`${dirname}/build/${app}/bundle.js`, { cache: {}, packageCache: {} });
         b.plugin(watchify);
         b.on("update", bundle);
         var build = new Build.Browserify(b);
@@ -245,7 +248,7 @@ module.exports = function(dirname, requireMap) {
             return b.bundle(cb)
                 .pipe(source("bundle.js"))
                 .pipe(buffer())
-                .pipe(gulp.dest(`bundle/${app}`))
+                .pipe(gulp.dest(`${dirname}/bundle/${app}`))
         }
         done();
     }
