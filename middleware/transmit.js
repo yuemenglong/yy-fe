@@ -10,18 +10,17 @@ function getMessage(status) {
     return `后台服务出错(${status})，请按F5刷新后重试`;
 }
 
-function createTransmit(host, port, cb) {
+function createTransmit(host, port, fn, fnErr, path) {
     return function(req, res) {
         function errorHandler(err) {
             logger.error(JSON.stringify(err.stack));
             res.status(500).end(JSON.stringify({ name: err.name, message: err.message }));
         }
-        var reqBuf = [];
         var resBuf = [];
         var options = {
             hostname: host,
             port: port,
-            path: req.originalUrl,
+            path: path || req.originalUrl,
             method: req.method,
             headers: req.headers,
         };
@@ -36,6 +35,9 @@ function createTransmit(host, port, cb) {
                 // 处理出错的情况
                 if (backendRes.statusCode >= 400) {
                     logger.error(formatRes(req, backendRes, body));
+                    if (fnErr) {
+                        return fnErr(req, res, body);
+                    }
                     try {
                         var err = JSON.parse(body);
                         return res.status(backendRes.statusCode).json(err);
@@ -49,39 +51,26 @@ function createTransmit(host, port, cb) {
                     res.writeHead(backendRes.statusCode, backendRes.headers);
                     return res.end();
                 }
-                // 处理ajax请求的情况
-                if (req.xhr) {
-                    res.writeHead(backendRes.statusCode, backendRes.headers);
-                    return res.end(body);
+                // 提供了回调函数
+                if (fn) {
+                    return fn(req, res, body);
                 }
+                // 透传
+                res.writeHead(backendRes.statusCode, backendRes.headers);
                 // 处理bin的情况
                 if (bin) {
-                    res.writeHead(backendRes.statusCode, backendRes.headers);
                     return res.end(raw);
                 }
-                // 处理ModalAndView的情况
-                try {
-                    var mv = JSON.parse(body);
-                    return res.render(mv.view, { init: mv.model, title: mv.title });
-                } catch (err) {
-                    return errorHandler(err);
-                }
+                return res.end(body);
             });
             backendRes.on("error", errorHandler);
         });
-        req.on("data", function(data) {
-            reqBuf.push(data);
-            backendReq.write(data);
-        })
-        req.on("end", function() {
-            var raw = Buffer.concat(reqBuf);
-            var body = iconv.decode(raw, "utf8");
-            logger.info(formatReq(req, body));
-            backendReq.end();
-        })
         req.on("error", errorHandler);
         res.on("error", errorHandler);
         backendReq.on("error", errorHandler);
+
+        logger.info(formatReq(req, JSON.strinigy(req.body)));
+        req.end(JSON.stringify(req.body));
     }
 }
 
