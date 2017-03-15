@@ -1,7 +1,6 @@
 {
   "name": "yy-fe",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.1",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -48,5 +47,7 @@
     "yy-build": "^1.0.6",
     "yy-fs": "^1.0.0",
     "yy-logger": "^1.0.1"
-  }
+  },
+  "devDependencies": {},
+  "description": ""
 }
