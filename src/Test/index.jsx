@@ -1,5 +1,5 @@
 var React = require("react");
-var App = require("../../App/index");
+var App = require("../../App");
 var ev = require("../../ev");
 require("./style.less");
 
