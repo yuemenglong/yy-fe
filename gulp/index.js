@@ -190,7 +190,7 @@ module.exports = function(dirname, requireMap) {
 
     function watchSrc(done) {
         var app = process.argv.slice(-1)[0].slice(2);
-        var watcher = gulp.watch([resolve("src/**/*.jsx"), resolve("src/**/*.js"), resolve("src/**/*.json")]);
+        var watcher = gulp.watch([resolve("src/**/*.jsx"), resolve("src/**/*.js"), resolve("src/**/*.json"), ]);
         watcher.on("change", function(path) {
             var build = new Build();
             build.plugin(new PathPlugin(dirname));
@@ -210,6 +210,11 @@ module.exports = function(dirname, requireMap) {
                 gulp.src(path).pipe(build()).pipe(gulp.dest(output));
             }
         })
+        var lessWatcher = gulp.watch([resolve("src/**/*.less")]);
+        lessWatcher.on("change", function(path) {
+            var output = P.dirname(replaceSrc(path, "build"));
+            gulp.src(path).pipe(gulp.dest(output));
+        })
         done();
 
         function timeString() {
@@ -225,25 +230,36 @@ module.exports = function(dirname, requireMap) {
         b.on("update", bundle);
         var build = new Build.Browserify(b);
         build.plugin(new ExcludePlugin(requireMap));
+        var lp = new LessPlugin("bundle.css");
+        build.plugin(lp);
         // build.plugin(new DebugPlugin());
-        bundle();
+        bundle(watchLess);
 
         function timeString() {
             var now = new Date();
             return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
         }
 
-        function cb(err) {
+        function watchLess() {
+            var watcher = gulp.watch(lp.getImports());
+            watcher.on("change", function(path) {
+                lp.rebuild(`${dirname}/bundle/${app}`);
+            })
+        }
+
+        function onFinish(err) {
             if (err) {
                 console.log(`[${timeString()}] Build [${app}] Fail`);
                 console.log(err.stack);
             } else {
+                lp.rebuild(`${dirname}/bundle/${app}`);
                 console.log(`[${timeString()}] Build [${app}] Succ`);
             }
         }
 
-        function bundle() {
+        function bundle(fn) {
             console.log(`[${timeString()}] Build [${app}] Start`)
+            var cb = typeof fn == "function" ? fn : onFinish;
             b.bundle(cb)
                 .pipe(source("bundle.js"))
                 .pipe(buffer())
