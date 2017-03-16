@@ -6,7 +6,8 @@ function ExcludePlugin(exclude) {
         exclude = [];
     }
     if (_.isPlainObject(exclude)) {
-        exclude = _.keys(exclude);
+        // null 是需要打包进去的
+        exclude = _.keys(exclude).filter(key => exclude[key] !== null);
     }
     //默认过滤less
     exclude.push(".*\\.less");

@@ -48,6 +48,7 @@ function getRequirementNodes(ast) {
 }
 
 function transform(file, content, plugins) {
+    console.log(`Build File: [${file}]`);
     if (IGNORES.indexOf(P.extname(file)) >= 0) {
         return content;
     }
@@ -71,6 +72,7 @@ function transform(file, content, plugins) {
         if (matches.length === 0) {
             return;
         }
+        console.log(`Build Through: [${plugin.constructor.name}]`);
         plugin.transform(file, matches, ast);
     });
     content = escodegen.generate(ast);

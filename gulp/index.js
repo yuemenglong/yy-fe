@@ -196,10 +196,6 @@ module.exports = function(dirname, requireMap) {
             build.plugin(new PathPlugin(dirname));
             build.plugin(new ImgPlugin());
             var output = P.dirname(replaceSrc(path, "build"));
-            // console.log(path, output);
-            // return;
-            // var output = P.resolve(dirname, P.dirname(path).replace(/^src/, "build"));
-            // path = P.resolve(dirname, path);
             console.log(`[${timeString()}] File Change: [${path}]`);
             console.log(`[${timeString()}] Build Output: [${output}]`);
             if (P.extname(path) == ".jsx") {
@@ -229,7 +225,7 @@ module.exports = function(dirname, requireMap) {
         b.on("update", bundle);
         var build = new Build.Browserify(b);
         build.plugin(new ExcludePlugin(requireMap));
-        build.plugin(new DebugPlugin());
+        // build.plugin(new DebugPlugin());
         bundle();
 
         function timeString() {
@@ -257,4 +253,6 @@ module.exports = function(dirname, requireMap) {
     }
 
     gulp.task('watch', gulp.series(watchValidate, build, disp, pack, watchSrc, watchBuild));
+
+    return gulp;
 }
