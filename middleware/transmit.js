@@ -69,8 +69,8 @@ function createTransmit(host, port, fn, fnErr, path) {
         res.on("error", errorHandler);
         backendReq.on("error", errorHandler);
 
-        logger.info(formatReq(req, JSON.strinigy(req.body)));
-        req.end(JSON.stringify(req.body));
+        logger.info(formatReq(req, JSON.stringify(req.body)));
+        backendReq.end(JSON.stringify(req.body));
     }
 }
 

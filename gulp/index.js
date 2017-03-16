@@ -244,7 +244,7 @@ module.exports = function(dirname, requireMap) {
 
         function bundle() {
             console.log(`[${timeString()}] Build [${app}] Start`)
-            return b.bundle(cb)
+            b.bundle(cb)
                 .pipe(source("bundle.js"))
                 .pipe(buffer())
                 .pipe(gulp.dest(`${dirname}/bundle/${app}`))

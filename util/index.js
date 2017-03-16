@@ -2,6 +2,7 @@ var util = require("util");
 
 exports.formatReq = function(req, body) {
     body = body ? "\n" + body : "";
+    body = req.method.toUpperCase() == "GET" ? "" : body;
     var type = req.xhr ? "AJAX" : "HTTP";
     return util.format("[%s-%s] %s%s",
         type, req.method.toUpperCase(),
