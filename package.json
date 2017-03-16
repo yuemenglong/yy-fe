@@ -17,6 +17,7 @@
   "homepage": "https://github.com/yuemenglong/yy-fe#readme",
   "dependencies": {
     "babel-preset-react": "^6.23.0",
+    "bluebird": "^3.5.0",
     "body-parser": "^1.16.1",
     "browserify": "^14.1.0",
     "cookie-parser": "^1.4.3",
