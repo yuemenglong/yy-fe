@@ -252,7 +252,6 @@ module.exports = function(dirname, requireMap) {
                 console.log(`[${timeString()}] Build [${app}] Fail`);
                 console.log(err.stack);
             } else {
-                lp.rebuild(`${dirname}/bundle/${app}`);
                 console.log(`[${timeString()}] Build [${app}] Succ`);
             }
         }

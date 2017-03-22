@@ -13,8 +13,10 @@ exports.createApp = function(reactClass) {
                 state.ev.on(ev.EVENT_TYPE, this.onChange);
                 return state;
             }
-            this.componentDidMount = function() {
-                $.ajaxSetup({ contentType: "application/json; charset=utf-8" });
+            this.componentWillMount = function() {
+                if (global.window) {
+                    $.ajaxSetup({ contentType: "application/json; charset=utf-8" });
+                }
             }
             this.onChange = function(props) {
                 this.setState(props);
