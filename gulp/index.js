@@ -66,15 +66,26 @@ module.exports = function(dirname, requireMap) {
 
     function getApps() {
         function getAppPath(path) {
+            var hasIndex = false;
             var subApps = fs.readdirSync(path).map(function(name) {
-                var stats = fs.statSync(`${path}/${name}`)
-                if (stats.isDirectory() && name == _.upperFirst(name))
+                var stats = fs.statSync(`${path}/${name}`);
+                if (stats.isFile() && name.match(/^index\./)) {
+                    hasIndex = true;
+                }
+                if (stats.isDirectory() && name == _.upperFirst(name)) {
                     return `${path}/${name}`;
+                }
             }).filter(function(path) {
                 return path != undefined;
             });
-            if (!subApps.length) {
+            if (!subApps.length && hasIndex) {
+                // 正常情况
                 ret.push(path);
+            } else if (subApps.length && hasIndex) {
+                // 异常情况，APP路径下还有子路径
+                throw Error(`[${path}] App Path Can't Has Sub Path With UpperCase`);
+            } else if (!subApps.length && !hasIndex) {
+                // 空路径，不用处理
             } else {
                 subApps.map(getAppPath);
             }
