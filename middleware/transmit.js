@@ -34,6 +34,7 @@ function createTransmit(host, port, fn, fnErr, path) {
                 var body = bin ? "" : iconv.decode(raw, "utf8");
                 // 处理出错的情况
                 if (backendRes.statusCode >= 400) {
+                    req._originalUrl = path; // 为了打日志 
                     logger.error(formatRes(req, backendRes, body));
                     if (fnErr) {
                         return fnErr(req, res, body);
@@ -45,6 +46,7 @@ function createTransmit(host, port, fn, fnErr, path) {
                         return res.status(backendRes.statusCode).end(JSON.stringify({ name: "BACKEND_ERROR", message: getMessage(backendRes.statusCode) }));
                     }
                 }
+                req._originalUrl = path; // 为了打日志 
                 logger.info(formatRes(req, backendRes, body));
                 // 处理重定向的情况
                 if (Math.floor(backendRes.statusCode / 100) == 3) {
@@ -69,6 +71,7 @@ function createTransmit(host, port, fn, fnErr, path) {
         res.on("error", errorHandler);
         backendReq.on("error", errorHandler);
 
+        req._originalUrl = path;
         logger.info(formatReq(req, JSON.stringify(req.body)));
         backendReq.end(JSON.stringify(req.body));
     }

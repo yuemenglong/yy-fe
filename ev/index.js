@@ -1,9 +1,12 @@
 var EventEmitter = require("events").EventEmitter;
+var fetch = require("./fetch");
+var _ = require("lodash");
 
-var globalHookFn;
-var EVENT_TYPE = "@@EVENT";
+var globalHookFn = null;
+var fetchData = {};
 
 var counter = 0;
+var EVENT_TYPE = "@@EVENT";
 
 function EventEmitterEx(parent) {
     EventEmitter.call(this);
@@ -98,11 +101,52 @@ EventEmitterEx.prototype.set = function(key, value) {
     this.env[key] = value;
 }
 
-EventEmitterEx.prototype.get = function(key) {
-    return this.env[key];
+EventEmitterEx.prototype.get = function(key, dft) {
+    if (this.env[key] === undefined) {
+        if (dft === undefined) {
+            throw Error(`Can't Get [${key}] From Ev, Maybe Need A Default Value`);
+        } else {
+            return dft;
+        }
+    } else {
+        return this.env[key];
+    }
+}
+
+EventEmitterEx.prototype.fetch = function(name, url) {
+    if (!fetchData[name]) {
+        fetchData[name] = {
+            name: name,
+            url: url,
+            data: undefined,
+        }
+    } else if (fetchData[name].url != url) {
+        throw Error(`Same Name [${name}] With Different Url [${fetchData[name].url}, ${url}]`)
+    }
 }
 
 var ev = new EventEmitterEx();
+
+ev.doFetch = function(fn) {
+    var list = _(fetchData).values().filter(function(item) {
+        return item.data === undefined;
+    }).value();
+    if (!list.length) {
+        fn(null, null);
+        return null;
+    }
+    fetch(list, function(res) {
+        _.keys(res).map(function(name) {
+            fetchData[name].data = res[name];
+            ev.env[name] = res[name]; // 通过get可以拿到
+        });
+        fn(null, res);
+    }, function(err) {
+        fn(err, null);
+    })
+    return list;
+};
+
 // ev.env = {};
 ev.globalHook(function() {
     // kit.debug([].slice.call(arguments));

@@ -6,7 +6,7 @@ exports.formatReq = function(req, body) {
     var type = req.xhr ? "AJAX" : "HTTP";
     return util.format("[%s-%s] %s%s",
         type, req.method.toUpperCase(),
-        req.originalUrl, body)
+        req._originalUrl || req.originalUrl, body)
 }
 
 exports.formatRes = function(req, res, body) {
@@ -14,5 +14,5 @@ exports.formatRes = function(req, res, body) {
     var type = req.xhr ? "AJAX" : "HTTP";
     return util.format("[%s-%s] [%d] %s%s",
         type, req.method.toUpperCase(),
-        res.statusCode, req.originalUrl, body)
+        res.statusCode, req._originalUrl || req.originalUrl, body)
 }
