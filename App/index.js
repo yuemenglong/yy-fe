@@ -3,8 +3,10 @@ var ReactDOM = require("react-dom");
 var _ = require("lodash");
 var ev = require("../ev");
 
-var init = global.window && window.__INITIAL_STATE__ || {};
-ev.setFetchData(init.ev);
+if (global.window) {
+    var init = window.__INITIAL_STATE__ || {};
+    ev.fetchData = init.ev;
+}
 
 exports.createApp = function(reactClass) {
     function __CREATE_APP__(initState) {

@@ -25,7 +25,7 @@ module.exports = function(dirname, host, port) {
                 } else {
                     var html = renderToStaticMarkup(app);
                     opt.html = html;
-                    opt.init = { ev: ev.getFetchData() };
+                    opt.init = { ev: ev.fetchData };
                     render(appName, opt)
                 }
             });
