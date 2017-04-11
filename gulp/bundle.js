@@ -1,6 +1,6 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
-var ev = require("yy-fe/ev"); // 这里极其特殊，因为这个文件是通过分发出去的，路径不在这里
+var ev = require("yy-fe/ev")(); // 这里极其特殊，因为这个文件是通过分发出去的，路径不在这里
 
 var App = require(".");
 if (App.name == "__CREATE_APP__") {

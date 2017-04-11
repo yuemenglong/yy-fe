@@ -3,7 +3,6 @@ var fetch = require("./fetch");
 var _ = require("lodash");
 
 function createRoot() {
-
     var ev = new EventEmitterEx();
     ev.fetchData = {};
     ev.fetch = function(name, url) {
@@ -64,6 +63,8 @@ function createRoot() {
     return ev;
 }
 
+var root = createRoot();
 
-module.exports = createRoot();
-module.exports.createRoot = createRoot;
+module.exports = function() {
+    return root;
+}

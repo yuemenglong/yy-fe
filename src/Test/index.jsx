@@ -1,6 +1,6 @@
 var React = require("react");
 var App = require("../../App");
-var ev = require("yy-fe/ev");
+var ev = require("yy-fe/ev")();
 require("./style.less");
 
 function SubClass() {
@@ -24,7 +24,7 @@ function TestClass() {
         return {};
     }
     this.getInitialState = function() {
-        return { fetch: ev.get("fetch-data") };
+        return { fetch: ev.get("fetch") };
     }
     this.renderSub = function() {
         if (!this.state.fetch) {

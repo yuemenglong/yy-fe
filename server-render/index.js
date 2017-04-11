@@ -1,6 +1,6 @@
 var React = require("react");
 var renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
-var ev = require("../ev");
+var ev = require("../ev")();
 var P = require("path");
 var logger = require("yy-logger");
 var fetchMiddleware = require("../middleware/fetch");

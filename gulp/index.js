@@ -278,7 +278,7 @@ module.exports = function(dirname, requireMap) {
         done();
     }
 
-    gulp.task('watch', gulp.series(watchValidate, build, disp, pack, watchSrc, watchBuild));
+    gulp.task('watch', gulp.series(watchValidate, build, disp, pack, dist, watchSrc, watchBuild));
 
     return gulp;
 }

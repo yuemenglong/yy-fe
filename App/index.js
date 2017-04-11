@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var _ = require("lodash");
-var ev = require("../ev");
+var ev = require("../ev")();
 
 if (global.window) {
     var init = window.__INITIAL_STATE__ || {};
