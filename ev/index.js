@@ -169,6 +169,14 @@ ev.doServerFetch = function(request, response, fetchFn, fn) {
     return list;
 }
 
+ev.getFetchData = function() {
+    return fetchData;
+}
+
+ev.setFetchData = function(data) {
+    fetchData = data || {};
+}
+
 // ev.env = {};
 ev.globalHook(function() {
     // kit.debug([].slice.call(arguments));

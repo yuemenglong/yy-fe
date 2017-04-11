@@ -3,6 +3,9 @@ var ReactDOM = require("react-dom");
 var _ = require("lodash");
 var ev = require("../ev");
 
+var init = global.window && window.__INITIAL_STATE__ || {};
+ev.setFetchData(init.ev);
+
 exports.createApp = function(reactClass) {
     function __CREATE_APP__(initState) {
         function AppClass() {
@@ -14,10 +17,9 @@ exports.createApp = function(reactClass) {
                 return {};
             }
             this.getInitialState = function() {
-                var state = global.window ? window.__INITIAL_STATE__ : initState;
-                state = state || {};
-                var state = _.merge({ ev: ev }, state);
-                state.ev.on(ev.EVENT_TYPE, this.onChange);
+                // state = state || {};
+                var state = _.defaults({ ev: ev }, init);
+                ev.on(ev.EVENT_TYPE, this.onChange);
                 return state;
             }
             this.onChange = function(props) {
