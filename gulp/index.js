@@ -173,7 +173,7 @@ module.exports = function(dirname, requireMap) {
         done();
     }
 
-    var all = gulp.series(build, disp, pack);
+    var all = gulp.series(build, disp, pack, dist);
 
     gulp.task("build", build);
     gulp.task("disp", disp);

@@ -3,6 +3,7 @@ var express = require("express");
 var logger = require("yy-logger");
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var createServerRender = require("./server-render").create;
 
 var fe = require(".");
 
@@ -14,6 +15,7 @@ var fetchMiddleware = fe.middleware.fetch;
 
 var transmit = transmitMiddleware("localhost", 8080);
 var fetch = fetchMiddleware("localhost", 8080);
+var serverRender = createServerRender(__dirname, "localhost", 8080);
 
 var app = express();
 app.set('views', __dirname + '/jade');
@@ -33,7 +35,8 @@ process.on("uncaughtException", function(err) {
 })
 
 app.get("/", function(req, res) {
-    res.render("Test", { title: "yy-fe-测试" });
+    serverRender("Test", req, res, { title: "yy-fe-测试" });
+    // res.render("Test", { title: "yy-fe-测试" });
 })
 
 app.listen(80, function(err) {

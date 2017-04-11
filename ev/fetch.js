@@ -1,6 +1,7 @@
 var _ = require("lodash");
+var Promise = require("bluebird");
 
-module.exports = function(pairs, fn, fnErr) {
+exports.browser = function(pairs, fn) {
     var search = pairs.map(function(item) {
         return [item.name, item.url].join("=");
     }).join("&");
@@ -8,7 +9,19 @@ module.exports = function(pairs, fn, fnErr) {
     $.ajax({
         url: url,
         type: "GET",
-        success: fn,
-        error: fnErr,
+        success: function(res) {
+            fn(null, res);
+        },
+        error: function(err) {
+            fn(err, null);
+        },
     })
+    return;
+}
+
+exports.server = function(pairs, request, respones, fetchFn, fn) {
+    pairs = pairs.map(function(item) {
+        return [item.name, item.url];
+    });
+    fetchFn(pairs, request, respones, fn);
 }

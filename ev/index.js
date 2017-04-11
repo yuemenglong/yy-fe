@@ -127,7 +127,7 @@ EventEmitterEx.prototype.fetch = function(name, url) {
 
 var ev = new EventEmitterEx();
 
-ev.doFetch = function(fn) {
+ev.doBrowserFetch = function(fn) {
     var list = _(fetchData).values().filter(function(item) {
         return item.data === undefined;
     }).value();
@@ -135,17 +135,39 @@ ev.doFetch = function(fn) {
         fn(null, null);
         return null;
     }
-    fetch(list, function(res) {
+    fetch.browser(list, function(err, res) {
+        if (err) {
+            return fn(err, res);
+        }
         _.keys(res).map(function(name) {
             fetchData[name].data = res[name];
             ev.env[name] = res[name]; // 通过get可以拿到
         });
         fn(null, res);
-    }, function(err) {
-        fn(err, null);
     })
     return list;
 };
+
+ev.doServerFetch = function(request, response, fetchFn, fn) {
+    var list = _(fetchData).values().filter(function(item) {
+        return item.data === undefined;
+    }).value();
+    if (!list.length) {
+        fn(null, null);
+        return null;
+    }
+    fetch.server(list, request, response, fetchFn, function(err, res) {
+        if (err) {
+            return fn(err, res);
+        }
+        _.keys(res).map(function(name) {
+            fetchData[name].data = res[name];
+            ev.env[name] = res[name]; // 通过get可以拿到
+        });
+        fn(null, res);
+    })
+    return list;
+}
 
 // ev.env = {};
 ev.globalHook(function() {

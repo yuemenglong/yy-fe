@@ -8,6 +8,20 @@ module.exports = function(host, port) {
             return next();
         }
         var pairs = _.toPairs(request.query);
+        var fetchFn = createFetch(host, port);
+        fetchFn(pairs, request, response, function(err, res) {
+            if (err) {
+                response.status(500).json(err);
+            } else {
+                response.json(res);
+            }
+        });
+    }
+}
+module.exports.createFetch = createFetch;
+
+function createFetch(host, port) {
+    return function(pairs, request, response, fn) {
         Promise.map(pairs, function(pair) {
             return new Promise(function(resolve, reject) {
                 var key = pair[0];
@@ -22,9 +36,12 @@ module.exports = function(host, port) {
             })
         }).then(function(res) {
             var result = _.fromPairs(res);
-            response.json(result);
+            fn(null, result);
+            // var result = _.fromPairs(res);
+            // response.json(result);
         }).catch(function(err) {
-            response.status(500).json(err);
+            fn(err, null);
+            // response.status(500).json(err);
         })
     }
 }

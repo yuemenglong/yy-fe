@@ -14,7 +14,7 @@ fetchLoop(function(app) {
 
 function fetchLoop(fn) {
     var app = React.createElement(App);
-    ev.doFetch(function(err, res) {
+    ev.doBrowserFetch(function(err, res) {
         if (err) {
             // 出错了
             console.error(err);
