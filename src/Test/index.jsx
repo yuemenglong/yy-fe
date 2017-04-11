@@ -5,14 +5,14 @@ require("./style.less");
 
 function SubClass() {
     this.getDefaultProps = function() {
-        ev.fetch("fetch-data2", "/fetch-data2");
+        ev.fetch("fetchSub", "/fetch-data2");
         return {};
     }
     this.getInitialState = function() {
-        return { data: ev.get("fetch-data2") };
+        return { fetchSub: ev.get("fetchSub") };
     }
     this.render = function() {
-        return jade(`h3 Sub`);
+        return jade(`h3 Sub {this.state.fetchSub.status}`);
     }
 }
 
@@ -20,14 +20,14 @@ var Sub = React.createClass(new SubClass());
 
 function TestClass() {
     this.getDefaultProps = function() {
-        ev.fetch("fetch-data", "/fetch-data");
+        ev.fetch("fetch", "/fetch-data");
         return {};
     }
     this.getInitialState = function() {
-        return { "fetch-data": ev.get("fetch-data") };
+        return { fetch: ev.get("fetch-data") };
     }
     this.renderSub = function() {
-        if (!this.state["fetch-data"]) {
+        if (!this.state.fetch) {
             return;
         }
         return jade(`Sub`);
@@ -35,7 +35,7 @@ function TestClass() {
     this.render = function() {
         return jade(`
         div
-            h1 Test
+            h1 Test {this.state.fetch.status}
             |{this.renderSub()}`);
     }
 }

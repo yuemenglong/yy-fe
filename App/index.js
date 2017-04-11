@@ -6,6 +6,10 @@ var ev = require("../ev");
 if (global.window) {
     var init = window.__INITIAL_STATE__ || {};
     ev.fetchData = init.ev;
+    // 用fetchData初始化env
+    ev.env = _(ev.fetchData).values().map(function(item) {
+        return [item.name, item.data];
+    }).fromPairs().value();
 }
 
 exports.createApp = function(reactClass) {
