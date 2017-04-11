@@ -1,7 +1,8 @@
-var error = require("./error.js");
-var logger = require("./logger.js");
-var transmit = require("./transmit.js");
-var upload = require("./upload.js");
-var fetch = require("./fetch.js");
+var error = require("./error");
+var logger = require("./logger");
+var transmit = require("./transmit");
+var upload = require("./upload");
+var fetch = require("./fetch");
+var serverRender = require("./server-render");
 
-module.exports = { error, logger, transmit, upload, fetch };
+module.exports = { error, logger, transmit, upload, fetch, serverRender };

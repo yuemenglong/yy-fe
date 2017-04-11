@@ -12,10 +12,11 @@ var uploadMiddleware = fe.middleware.upload;
 var loggerMiddleware = fe.middleware.logger;
 var errorMiddleware = fe.middleware.error;
 var fetchMiddleware = fe.middleware.fetch;
+var serverRenderMiddleware = fe.middleware.serverRender;
 
 var transmit = transmitMiddleware("localhost", 8080);
 var fetch = fetchMiddleware("localhost", 8080);
-var serverRender = createServerRender(__dirname, "localhost", 8080);
+var serverRender = serverRenderMiddleware(__dirname, "localhost", 8080);
 
 var app = express();
 app.set('views', __dirname + '/jade');
@@ -27,6 +28,7 @@ app.use("/upload", uploadMiddleware("static/files"));
 app.use(fetch);
 app.use(transmit);
 app.use(bodyParser.json());
+app.use(serverRender);
 app.use(loggerMiddleware());
 app.use(errorMiddleware());
 
@@ -35,8 +37,8 @@ process.on("uncaughtException", function(err) {
 })
 
 app.get("/", function(req, res) {
-    serverRender("Test", req, res, { title: "yy-fe-测试" });
-    // res.render("Test", { title: "yy-fe-测试" });
+    // serverRender("Test", req, res, { title: "yy-fe-测试" });
+    res.render("Test", { title: "yy-fe-测试" });
 })
 
 app.listen(80, function(err) {
