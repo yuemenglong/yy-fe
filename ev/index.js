@@ -7,6 +7,7 @@ function createRoot() {
     var fetchData = {};
 
     ev.fetch = function(name, url) {
+        console.log(name, url);
         if (!fetchData[name]) {
             fetchData[name] = {
                 name: name,
@@ -22,29 +23,6 @@ function createRoot() {
             return null;
         }
     }
-
-    ev.doBrowserFetch = function(fn) {
-        var localFetchData = fetchData; // 通过闭包保存一下
-        var that = this;
-        var list = _(localFetchData).values().filter(function(item) {
-            return item.data === undefined;
-        }).value();
-        if (!list.length) {
-            fn(null, null);
-            return null;
-        }
-        fetch.browser(list, function(err, res) {
-            if (err) {
-                return fn(err, res);
-            }
-            _.keys(res).map(function(name) {
-                localFetchData[name].data = res[name];
-                // that.env[name] = res[name]; // 通过get可以拿到
-            });
-            fn(null, res);
-        })
-        return list;
-    };
 
     ev.getFetchData = function() {
         return fetchData;

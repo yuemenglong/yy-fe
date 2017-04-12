@@ -5,37 +5,34 @@ var ev = require("../ev");
 
 if (global.window) {
     var init = window.__INITIAL_STATE__ || {};
-    ev.setFetchData(init.ev);
-    // 用fetchData初始化env
-    ev.env = _(ev.getFetchData()).values().map(function(item) {
-        return [item.name, item.data];
-    }).fromPairs().value();
+    // 用fetchData初始化ev
+    ev.setFetchData(init.ev || {});
+    // ev.env = _(ev.getFetchData()).values().map(function(item) {
+    //     return [item.name, item.data];
+    // }).fromPairs().value();
 }
 
 exports.createApp = function(reactClass) {
-    function __CREATE_APP__(initState) {
-        function AppClass() {
-            this.getDefaultProps = function() {
-                // 保证最先执行到
-                if (global.window && global.$) {
-                    $.ajaxSetup({ contentType: "application/json; charset=utf-8" });
-                }
-                return {};
+    function AppClass() {
+        this.getDefaultProps = function() {
+            // 保证最先执行到
+            if (global.window && global.$) {
+                $.ajaxSetup({ contentType: "application/json; charset=utf-8" });
             }
-            this.getInitialState = function() {
-                // state = state || {};
-                var state = _.defaults({ ev: ev }, init);
-                ev.on(ev.EVENT_TYPE, this.onChange);
-                return state;
-            }
-            this.onChange = function(props) {
-                this.setState(props);
-            }
-            this.render = function() {
-                return React.createElement(reactClass, this.state);
-            }
+            return {};
         }
-        return React.createClass(new AppClass());
+        this.getInitialState = function() {
+            // state = state || {};
+            var state = _.defaults({ ev: ev }, init);
+            ev.on(ev.EVENT_TYPE, this.onChange);
+            return state;
+        }
+        this.onChange = function(props) {
+            this.setState(props);
+        }
+        this.render = function() {
+            return React.createElement(reactClass, this.state);
+        }
     }
-    return __CREATE_APP__;
+    return React.createClass(new AppClass());
 }

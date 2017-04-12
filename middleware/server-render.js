@@ -14,21 +14,15 @@ module.exports = function(dirname, host, port) {
         response.render = function(appName, opt) {
             var appPath = P.resolve(dirname, "dist", appName);
             var App = require(appPath);
-            if (App.name == "__CREATE_APP__") {
-                App = App();
-            }
-            var app = React.createElement(App);
             var fetchData = {};
-            var backup = ev.setFetchData(fetchData);
-            var html = renderToStaticMarkup(app);
-            ev.setFetchData(backup);
+            swapAndRender(fetchData, App);
             // ev.doServerFetch = function(request, response, fetchFn, fn) 
             serverFetch(request, response, fetchData, fetchFn, function(err, res) {
                 if (err) {
                     logger.error(JSON.stringify(err.stack));
                     response.status(500).json(err);
                 } else {
-                    opt.html = renderToStaticMarkup(app);
+                    opt.html = swapAndRender(fetchData, App);
                     opt.init = _.defaults({ ev: fetchData }, opt.init);
                     render(appName, opt)
                 }
@@ -37,6 +31,14 @@ module.exports = function(dirname, host, port) {
         next();
         // return renderToStaticMarkup(app);
     }
+}
+
+function swapAndRender(fetchData, App) {
+    var backup = ev.setFetchData(fetchData);
+    var app = React.createElement(App);
+    var html = renderToStaticMarkup(app);
+    ev.setFetchData(backup);
+    return html;
 }
 
 function serverFetch(request, response, fetchData, fetchFn, fn) {
@@ -62,9 +64,3 @@ function serverFetch(request, response, fetchData, fetchFn, fn) {
         fn(null, res);
     });
 }
-
-ev.doServerFetch = function(request, response, fetchFn, fn) {
-
-}
-
-// serverRender( req, res, "Test",{title:"asdf"});
