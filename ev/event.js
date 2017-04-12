@@ -54,10 +54,12 @@ EventEmitterEx.prototype.globalHook = function(cb) {
     }
 }
 EventEmitterEx.prototype.on = function(type, cb) {
+    if (!global.window) return this;
     EventEmitter.prototype.on.apply(this, arguments);
     return this;
 }
 
+//等价于emit(@@EVENT, ...)
 EventEmitterEx.prototype.event = function() {
     if (typeof arguments[0] == "function") {
         throw new Error("Event Not Support Fn, Please Call Fork Instead");

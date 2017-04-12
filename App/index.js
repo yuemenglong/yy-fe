@@ -1,13 +1,13 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var _ = require("lodash");
-var ev = require("../ev")();
+var ev = require("../ev");
 
 if (global.window) {
     var init = window.__INITIAL_STATE__ || {};
-    ev.fetchData = init.ev;
+    ev.setFetchData(init.ev);
     // 用fetchData初始化env
-    ev.env = _(ev.fetchData).values().map(function(item) {
+    ev.env = _(ev.getFetchData()).values().map(function(item) {
         return [item.name, item.data];
     }).fromPairs().value();
 }

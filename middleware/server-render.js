@@ -1,9 +1,10 @@
 var React = require("react");
 var renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
-var ev = require("../ev")();
+var ev = require("../ev");
 var P = require("path");
 var logger = require("yy-logger");
 var fetchMiddleware = require("../middleware/fetch");
+var _ = require("lodash");
 
 module.exports = function(dirname, host, port) {
     var fetchFn = fetchMiddleware.createFetch(host, port);
@@ -17,15 +18,18 @@ module.exports = function(dirname, host, port) {
                 App = App();
             }
             var app = React.createElement(App);
+            var fetchData = {};
+            var backup = ev.setFetchData(fetchData);
+            var html = renderToStaticMarkup(app);
+            ev.setFetchData(backup);
             // ev.doServerFetch = function(request, response, fetchFn, fn) 
-            ev.doServerFetch(request, response, fetchFn, function(err, res) {
+            serverFetch(request, response, fetchData, fetchFn, function(err, res) {
                 if (err) {
                     logger.error(JSON.stringify(err.stack));
-                    response.status(500).json(JSON.parse(JSON.stringify(err)));
+                    response.status(500).json(err);
                 } else {
-                    var html = renderToStaticMarkup(app);
-                    opt.html = html;
-                    opt.init = { ev: ev.fetchData };
+                    opt.html = renderToStaticMarkup(app);
+                    opt.init = _.defaults({ ev: fetchData }, opt.init);
                     render(appName, opt)
                 }
             });
@@ -33,6 +37,34 @@ module.exports = function(dirname, host, port) {
         next();
         // return renderToStaticMarkup(app);
     }
+}
+
+function serverFetch(request, response, fetchData, fetchFn, fn) {
+    var that = this;
+    var list = _(fetchData).values().filter(function(item) {
+        return item.data === undefined;
+    }).value();
+    if (!list.length) {
+        fn(null, null);
+        return;
+    }
+    var query = _(list).map(function(item) {
+        return [item.name, item.url];
+    }).fromPairs().value();
+    fetchFn(query, request, response, function(err, res) {
+        if (err) {
+            return fn(err, res);
+        }
+        _.keys(res).map(function(name) {
+            fetchData[name].data = res[name];
+            // that.env[name] = res[name]; // 通过get可以拿到
+        });
+        fn(null, res);
+    });
+}
+
+ev.doServerFetch = function(request, response, fetchFn, fn) {
+
 }
 
 // serverRender( req, res, "Test",{title:"asdf"});

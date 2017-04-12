@@ -3,7 +3,6 @@ var express = require("express");
 var logger = require("yy-logger");
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var createServerRender = require("./server-render").create;
 
 var fe = require(".");
 

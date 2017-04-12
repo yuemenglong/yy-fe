@@ -18,10 +18,3 @@ exports.browser = function(pairs, fn) {
     })
     return;
 }
-
-exports.server = function(pairs, request, respones, fetchFn, fn) {
-    pairs = pairs.map(function(item) {
-        return [item.name, item.url];
-    });
-    fetchFn(pairs, request, respones, fn);
-}

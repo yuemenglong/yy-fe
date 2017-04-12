@@ -7,9 +7,8 @@ module.exports = function(host, port) {
         if (request.path != "/fetch") {
             return next();
         }
-        var pairs = _.toPairs(request.query);
         var fetchFn = createFetch(host, port);
-        fetchFn(pairs, request, response, function(err, res) {
+        fetchFn(request.query, request, response, function(err, res) {
             if (err) {
                 response.status(500).json(err);
             } else {
@@ -21,7 +20,8 @@ module.exports = function(host, port) {
 module.exports.createFetch = createFetch;
 
 function createFetch(host, port) {
-    return function(pairs, request, response, fn) {
+    return function(query, request, response, fn) {
+        var pairs = _.toPairs(query);
         Promise.map(pairs, function(pair) {
             return new Promise(function(resolve, reject) {
                 var key = pair[0];
