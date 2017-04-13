@@ -28,6 +28,7 @@ function TestClass() {
         return jade(`
         div
             h1 Test {this.state.fetch.status}
+            pre {JSON.stringify(ev.window(), null, 2)}
             // |{this.renderSub()}
             `);
     }

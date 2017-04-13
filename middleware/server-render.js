@@ -4,6 +4,7 @@ var ev = require("../ev");
 var P = require("path");
 var logger = require("yy-logger");
 var fetchMiddleware = require("../middleware/fetch");
+var URL = require("URL");
 var _ = require("lodash");
 
 module.exports = function(dirname, host, port) {
@@ -15,14 +16,15 @@ module.exports = function(dirname, host, port) {
             var appPath = P.resolve(dirname, "dist", appName);
             var App = require(appPath);
             var fetchData = {};
-            swapAndRender(fetchData, App);
+            var win = buildWindow(request, response);
+            swapAndRender(fetchData, win, App);
             // ev.doServerFetch = function(request, response, fetchFn, fn) 
             serverFetch(request, response, fetchData, fetchFn, function(err, res) {
                 if (err) {
                     logger.error(JSON.stringify(err.stack));
                     response.status(500).json(err);
                 } else {
-                    opt.html = swapAndRender(fetchData, App);
+                    opt.html = swapAndRender(fetchData, win, App);
                     opt.init = _.defaults({ ev: fetchData }, opt.init);
                     render(appName, opt)
                 }
@@ -33,11 +35,18 @@ module.exports = function(dirname, host, port) {
     }
 }
 
-function swapAndRender(fetchData, App) {
-    var backup = ev.setFetchData(fetchData);
+function buildWindow(request, response) {
+    var location = URL.parse(request.originalUrl);
+    return { location: location };
+}
+
+function swapAndRender(fetchData, win, App) {
+    var backupFetchData = ev.setFetchData(fetchData);
+    var backupWindow = ev.setWindow(win);
     var app = React.createElement(App);
     var html = renderToStaticMarkup(app);
-    ev.setFetchData(backup);
+    ev.setFetchData(backupFetchData);
+    ev.setWindow(backupWindow);
     return html;
 }
 

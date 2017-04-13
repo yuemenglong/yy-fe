@@ -27,7 +27,7 @@ app.use("/upload", uploadMiddleware("static/files"));
 app.use(fetch);
 app.use(transmit);
 app.use(bodyParser.json());
-// app.use(serverRender);
+app.use(serverRender);
 app.use(loggerMiddleware());
 app.use(errorMiddleware());
 

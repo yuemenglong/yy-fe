@@ -4,6 +4,7 @@ var _ = require("lodash");
 function createRoot() {
     var ev = new EventEmitterEx();
     var fetchData = {};
+    var window = global.window || {};
 
     ev.fetch = function(name, url) {
         if (!fetchData[name]) {
@@ -28,6 +29,14 @@ function createRoot() {
     ev.setFetchData = function(data) {
         var ret = fetchData;
         fetchData = data;
+        return ret;
+    }
+    ev.window = function() {
+        return window;
+    }
+    ev.setWindow = function(win) {
+        var ret = window;
+        window = win;
         return ret;
     }
     return ev;
