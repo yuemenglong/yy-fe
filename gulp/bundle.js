@@ -29,7 +29,7 @@ function browserFetch(fn) {
         return fn(null, null);
     }
     var search = list.map(function(item) {
-        return [item.name, item.url].join("=");
+        return [item.name, encodeURIComponent(item.url)].join("=");
     }).join("&");
     var url = "/fetch?" + search;
     $.ajax({
