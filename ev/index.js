@@ -1,5 +1,4 @@
 var EventEmitterEx = require("./event");
-var fetch = require("./fetch");
 var _ = require("lodash");
 
 function createRoot() {
@@ -7,7 +6,6 @@ function createRoot() {
     var fetchData = {};
 
     ev.fetch = function(name, url) {
-        console.log(name, url);
         if (!fetchData[name]) {
             fetchData[name] = {
                 name: name,

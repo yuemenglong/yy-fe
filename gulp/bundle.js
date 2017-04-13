@@ -1,10 +1,52 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
+var _ = require("lodash");
 var ev = require("yy-fe/ev"); // 这里极其特殊，因为这个文件是通过分发出去的，路径不在这里
 
 var App = require(".");
+renderToTemp(App);
+browserFetch(function(err, res) {
+    if (err) {
+        window.alert("加载错误");
+    } else {
+        var app = React.createElement(App);
+        ReactDOM.render(app, document.getElementById("container"));
+    }
+})
 
-// var app = React.createElement(App);
+function renderToTemp(App) {
+    var app = React.createElement(App);
+    var tempNode = document.createElement("div");
+    ReactDOM.render(app, tempNode);
+}
+
+function browserFetch(fn) {
+    var fetchData = ev.getFetchData();
+    var list = _.values(fetchData).filter(function(item) {
+        return item.data === undefined;
+    });
+    if (!list.length) {
+        return fn(null, null);
+    }
+    var search = list.map(function(item) {
+        return [item.name, item.url].join("=");
+    }).join("&");
+    var url = "/fetch?" + search;
+    $.ajax({
+        url: url,
+        type: "GET",
+        success: function(res) {
+            _.keys(res).map(function(name) {
+                fetchData[name].data = res[name];
+            })
+            fn(null, res);
+        },
+        error: function(err) {
+            fn(err, null);
+        },
+    })
+}
+
 // ReactDOM.render(app, document.getElementById("container"));
 // fetchLoop(function(app) {
 //     ReactDOM.render(app, document.getElementById("container"));

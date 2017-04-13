@@ -16,3 +16,10 @@ exports.formatRes = function(req, res, body) {
         type, req.method.toUpperCase(),
         res.statusCode, req._originalUrl || req.originalUrl, body)
 }
+
+exports.createHtmlNode = function() {
+    var num = parseInt(Math.random() * 10000);
+    var id = `temp-${num}`;
+    console.log(id);
+    return id;
+}

@@ -7,9 +7,10 @@ if (global.window) {
     var init = window.__INITIAL_STATE__ || {};
     // 用fetchData初始化ev
     ev.setFetchData(init.ev || {});
-    // ev.env = _(ev.getFetchData()).values().map(function(item) {
-    //     return [item.name, item.data];
-    // }).fromPairs().value();
+    // 同时初始化env
+    ev.env = _(ev.getFetchData()).values().map(function(item) {
+        return [item.name, item.data];
+    }).fromPairs().value();
 }
 
 exports.createApp = function(reactClass) {
