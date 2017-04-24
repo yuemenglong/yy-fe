@@ -46,6 +46,14 @@ module.exports = function(dirname, requireMap) {
     if (!dirname || !requireMap) {
         throw Error("Need __dirname And requireMap Arguments");
     }
+    var serverExclude = _.toPairs(requireMap).filter(function(pair) {
+        // 以单斜杠开头的都是只能用在客户端的
+        return _([pair[1]]).flattenDeep().some(function(url) {
+            return /^\/[^/]/.test(url);
+        })
+    }).map(function(pair) {
+        return pair[0];
+    });
     requireMap = _.merge(defaultMap, requireMap);
 
     function resolve(path) {
@@ -156,7 +164,7 @@ module.exports = function(dirname, requireMap) {
 
     function dist() {
         var build = new Build();
-        build.plugin(new ExcludePlugin());
+        build.plugin(new ExcludePlugin(serverExclude));
         return gulp.src([resolve("build/**/*.js"), resolve("build/**/*.json")]).pipe(build()).pipe(gulp.dest(`dist`));
     }
 

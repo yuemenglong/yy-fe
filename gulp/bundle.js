@@ -4,8 +4,9 @@ var _ = require("lodash");
 var ev = require("yy-fe/ev"); // 这里极其特殊，因为这个文件是通过分发出去的，路径不在这里
 
 var App = require(".");
-renderToTemp(App);
+var tempNode = renderToTemp(App);
 browserFetch(function(err, res) {
+    ReactDOM.unmountComponentAtNode(tempNode);
     if (err) {
         window.alert("加载错误");
     } else {
@@ -18,6 +19,7 @@ function renderToTemp(App) {
     var app = React.createElement(App);
     var tempNode = document.createElement("div");
     ReactDOM.render(app, tempNode);
+    return tempNode;
 }
 
 function browserFetch(fn) {
