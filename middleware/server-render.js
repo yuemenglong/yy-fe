@@ -5,6 +5,7 @@ var P = require("path");
 var logger = require("yy-logger");
 var fetchMiddleware = require("../middleware/fetch");
 var URL = require("URL");
+var createApp = require("../gulp/bundle").createApp;
 var _ = require("lodash");
 
 module.exports = function(dirname, host, port) {
@@ -15,6 +16,7 @@ module.exports = function(dirname, host, port) {
         response.render = function(appName, opt) {
             var appPath = P.resolve(dirname, "dist", appName);
             var App = require(appPath);
+            var App = createApp(App);
             var fetchData = {};
             var win = buildWindow(request, response);
             swapAndRender(fetchData, win, App);

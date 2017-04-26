@@ -1,5 +1,4 @@
 var React = require("react");
-var App = require("../../App");
 var ev = require("yy-fe/ev");
 require("./style.less");
 
@@ -28,11 +27,10 @@ function TestClass() {
         return jade(`
         div
             h1 Test {this.state.fetch.status}
-            pre {JSON.stringify(ev.window(), null, 2)}
-            // |{this.renderSub()}
+            pre {JSON.stringify(ev, null, 2)}
+            |{this.renderSub()}
             `);
     }
 }
 
-var Test = React.createClass(new TestClass())
-module.exports = App.createApp(Test);
+module.exports = React.createClass(new TestClass())

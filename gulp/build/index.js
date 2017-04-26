@@ -1,5 +1,5 @@
 var _ = require("lodash");
-var fs = require("fs");
+var fs = require("yy-fs");
 var P = require("path");
 var through = require('through2');
 var stream = require("stream");
@@ -20,8 +20,6 @@ var pathPattern = /.*require\((['"])(.+)\1\).*/;
 var useStrictPattern = /^(['"])use strict\1.*/g
 
 var IGNORES = [];
-
-var DEBUG = true;
 
 function ignore(igs) {
     IGNORES = _.flatten([igs]);
@@ -102,6 +100,8 @@ function Browserify(browserify) {
     if (!browserify) {
         throw new Error("Must Pass Browserify As Arguments When Use Prerequire Transform");
     }
+    var DEBUG_DIR = null;
+
     var ret = function(file, opt) {
         var buf = [];
         var obj = through(function(chunk, enc, cb) {
@@ -111,9 +111,13 @@ function Browserify(browserify) {
             var content = Buffer.concat(buf).toString();
             content = transform(file, content, ret.plugins);
             this.push(new Buffer(content));
-            if (DEBUG) {
-                var debugFile = `${file}.bundle`;
-                console.log(`Write Browserify Output To [${debugFile}]`);
+            if (DEBUG_DIR) {
+                var relative = P.relative(DEBUG_DIR, file);
+                var debugDir = P.resolve(DEBUG_DIR, "bundle-debug");
+                fs.mkdirSync(debugDir);
+                var debugFile = P.resolve(debugDir, relative);
+                // var debugFile = `${file}.bundle`;
+                console.log(`Write Bundle Debug To [${debugFile}]`);
                 fs.writeFileSync(debugFile, content);
             }
             return cb();
@@ -121,6 +125,14 @@ function Browserify(browserify) {
         // wrapEvent(obj, ret);
         return obj;
     }
+    ret.debug = function(dirname) {
+        console.log("debug", dirname);
+        if (!dirname) {
+            throw Error("Call Debug Must With Dirname");
+        }
+        DEBUG_DIR = dirname;
+    }
+
     wrapPlugin(ret);
     browserify.on('bundle', function(bundle) {
         bundle.on("end", function() {
