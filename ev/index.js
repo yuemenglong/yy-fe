@@ -1,5 +1,4 @@
 var EventEmitterEx = require("./event");
-var _ = require("lodash");
 
 function createRoot() {
     var ev = new EventEmitterEx();

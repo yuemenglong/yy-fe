@@ -1,5 +1,5 @@
 var EventEmitter = require("events").EventEmitter;
-var _ = require("lodash");
+var _ = require("./lodash");
 
 var counter = 0;
 var EVENT_TYPE = "@@EVENT";
