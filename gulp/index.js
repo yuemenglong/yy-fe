@@ -251,7 +251,6 @@ module.exports = function(dirname, requireMap) {
         build.plugin(new ExcludePlugin(requireMap));
         var lp = new LessPlugin("bundle.css");
         build.plugin(lp);
-        // build.plugin(new DebugPlugin());
         bundle(watchLess);
 
         function timeString() {

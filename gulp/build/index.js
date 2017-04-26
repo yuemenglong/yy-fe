@@ -1,4 +1,5 @@
 var _ = require("lodash");
+var fs = require("fs");
 var P = require("path");
 var through = require('through2');
 var stream = require("stream");
@@ -19,6 +20,8 @@ var pathPattern = /.*require\((['"])(.+)\1\).*/;
 var useStrictPattern = /^(['"])use strict\1.*/g
 
 var IGNORES = [];
+
+var DEBUG = true;
 
 function ignore(igs) {
     IGNORES = _.flatten([igs]);
@@ -108,6 +111,11 @@ function Browserify(browserify) {
             var content = Buffer.concat(buf).toString();
             content = transform(file, content, ret.plugins);
             this.push(new Buffer(content));
+            if (DEBUG) {
+                var debugFile = `${file}.bundle`;
+                console.log(`Write Browserify Output To [${debugFile}]`);
+                fs.writeFileSync(debugFile, content);
+            }
             return cb();
         });
         // wrapEvent(obj, ret);
