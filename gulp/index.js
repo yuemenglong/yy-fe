@@ -144,7 +144,7 @@ module.exports = function(dirname, requireMap) {
             var dest = replaceSrc(name, "bundle");
             var b = browserify(src);
             var build = new Build.Browserify(b);
-            build.debug(dirname);
+            // build.debug(dirname);
             var jp = new JadePlugin(requireMap, appName, `${appName}.jade`);
             var lp = new LessPlugin("bundle.css");
             build.plugin(jp);
