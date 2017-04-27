@@ -60,5 +60,3 @@ function browserFetch(fn) {
         },
     })
 }
-
-module.exports.createApp = createApp;

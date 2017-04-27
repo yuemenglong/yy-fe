@@ -24,9 +24,9 @@ app.use(cookieParser());
 app.use('/bundle', express.static(__dirname + '/bundle'));
 app.use('/static', express.static(__dirname + '/static'));
 app.use("/upload", uploadMiddleware("static/files"));
-app.use(fetch);
-app.use(transmit);
+app.use(fetch); // fetch接口依赖的数据不需要transmit了,可能绕过权限
 app.use(bodyParser.json());
+app.use(transmit);
 app.use(serverRender);
 app.use(loggerMiddleware());
 app.use(errorMiddleware());
@@ -36,7 +36,6 @@ process.on("uncaughtException", function(err) {
 })
 
 app.get("/", function(req, res) {
-    // serverRender("Test", req, res, { title: "yy-fe-测试" });
     res.render("Test", { title: "yy-fe-测试" });
 })
 
