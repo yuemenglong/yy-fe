@@ -30,6 +30,7 @@ var PathPlugin = Build.PathPlugin;
 var defaultMap = {
     "react": "//cdn.bootcss.com/react/0.14.9/react.js",
     "react-dom": "//cdn.bootcss.com/react/0.14.9/react-dom.js",
+    "react-router": "//cdn.bootcss.com/react-router/2.8.1/ReactRouter.min.js",
     "lodash": "//cdn.bootcss.com/lodash.js/4.12.0/lodash.min.js",
     "bluebird": "//cdn.bootcss.com/bluebird/3.3.5/bluebird.min.js",
     "moment": "//cdn.bootcss.com/moment.js/2.13.0/moment.min.js",

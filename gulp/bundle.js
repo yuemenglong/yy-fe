@@ -15,9 +15,17 @@ if (global.window) {
     }).fromPairs().value();
 
     var App = require(".");
-    var app = React.createElement(App);
+    var app = createApp(App);
     ReactDOM.render(app, document.getElementById("container"));
     fetchLoop();
+}
+
+function createApp(App) {
+    if (typeof App == "function") {
+        return React.createElement(App);
+    } else {
+        return App;
+    }
 }
 
 function fetchLoop() {
