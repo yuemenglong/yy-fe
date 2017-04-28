@@ -38,8 +38,8 @@
     "merge-stream": "^1.0.1",
     "moment": "^2.17.1",
     "node-uuid": "^1.4.7",
-    "react": "^15.0.2",
-    "react-dom": "^15.0.2",
+    "react": "^0.14.9",
+    "react-dom": "^0.14.9",
     "through2": "^2.0.1",
     "vinyl-buffer": "^1.0.0",
     "vinyl-paths": "^2.1.0",
@@ -49,9 +49,5 @@
     "yy-fs": "^1.0.0",
     "yy-logger": "^1.0.1"
   },
-  "devDependencies": {},
-  "description": "\u001b",
-  "keywords": [
-    "\u001b"
-  ]
+  "devDependencies": {}
 }
