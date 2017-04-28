@@ -15,23 +15,21 @@ if (global.window) {
     }).fromPairs().value();
 
     var App = require(".");
-    var tempNode = renderToTemp(App);
-    browserFetch(function(err, res) {
-        ReactDOM.unmountComponentAtNode(tempNode);
-        if (err) {
-            window.alert("加载错误");
-        } else {
-            var app = React.createElement(App);
-            ReactDOM.render(app, document.getElementById("container"));
-        }
-    })
+    var app = React.createElement(App);
+    ReactDOM.render(app, document.getElementById("container"));
+    fetchLoop();
 }
 
-function renderToTemp(App) {
-    var app = React.createElement(App);
-    var tempNode = document.createElement("div");
-    ReactDOM.render(app, tempNode);
-    return tempNode;
+function fetchLoop() {
+    browserFetch(function(err, res) {
+        if (err) {
+            window.alert("加载错误");
+        } else if (res) {
+            fetchLoop();
+        } else {
+            setTimeout(fetchLoop, 1000);
+        }
+    })
 }
 
 function browserFetch(fn) {
@@ -46,12 +44,13 @@ function browserFetch(fn) {
         return [item.name, encodeURIComponent(item.url)].join("=");
     }).join("&");
     var url = "/fetch?" + search;
-    $.ajax({
+    return $.ajax({
         url: url,
         type: "GET",
         success: function(res) {
             _.keys(res).map(function(name) {
                 fetchData[name].data = res[name];
+                fetchData[name].cb(res[name]);
             })
             fn(null, res);
         },

@@ -2,35 +2,54 @@ var React = require("react");
 var ev = require("yy-fe/ev");
 require("./style.less");
 
-function SubClass() {
+function ThirdClass() {
+    this.fetch = ev.createFetch();
     this.getInitialState = function() {
-        return { fetchSub: ev.fetch("fetchSub", "/fetch-data2") || {} };
+        return { fetchThird: this.fetch("fetchThird", "/fetch-data3") || {} };
     }
     this.render = function() {
-        return jade(`h3 Sub {this.state.fetchSub.status}`);
+        return jade(`h5 Third {this.state.fetchThird.status}`);
     }
 }
+var Third = React.createClass(new ThirdClass());
 
-var Sub = React.createClass(new SubClass());
-
-function TestClass() {
+function SecondClass() {
+    this.fetch = ev.createFetch();
     this.getInitialState = function() {
-        return { fetch: ev.fetch("fetch", "/fetch-data") || {} };
+        return { fetchSecond: this.fetch("fetchSecond", "/fetch-data2") || {} };
     }
-    this.renderSub = function() {
-        if (!this.state.fetch) {
+    this.renderThird = function() {
+        if (!this.state.fetchSecond.status) {
             return;
         }
-        return jade(`Sub`);
+        return jade(`Third`);
     }
     this.render = function() {
         return jade(`
         div
-            h1 Test {this.state.fetch.status}
+            h3 Second {this.state.fetchSecond.status}
+            |{this.renderThird()}
+            `);
+    }
+}
+var Second = React.createClass(new SecondClass());
+
+function FirstClass() {
+    this.fetch = ev.createFetch();
+    this.getInitialState = function() {
+        return { fetch: this.fetch("fetch", "/fetch-data") || {} };
+    }
+    this.renderSecond = function() {
+        return jade(`Second`);
+    }
+    this.render = function() {
+        return jade(`
+        div
             pre {JSON.stringify(ev, null, 2)}
-            |{this.renderSub()}
+            h1 Test {this.state.fetch.status}
+            |{this.renderSecond()}
             `);
     }
 }
 
-module.exports = React.createClass(new TestClass())
+module.exports = React.createClass(new FirstClass())

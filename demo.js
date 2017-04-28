@@ -48,11 +48,15 @@ app.listen(80, function(err) {
 });
 
 var be = express();
+be.use(loggerMiddleware());
 be.get("/fetch-data", function(req, res) {
     res.json({ status: "succ" });
 })
 be.get("/fetch-data2", function(req, res) {
     res.json({ status: "succ2" });
+})
+be.get("/fetch-data3", function(req, res) {
+    res.json({ status: "succ3" });
 })
 be.listen(8080, function(err) {
     if (err) {

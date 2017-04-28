@@ -5,20 +5,55 @@ function createRoot() {
     var fetchData = {};
     var window = global.window || {};
 
-    ev.fetch = function(name, url) {
-        if (!fetchData[name]) {
-            fetchData[name] = {
-                name: name,
-                url: url,
-                data: undefined,
+    // ev.fetch = function(name, url) {
+    //     if (!fetchData[name]) {
+    //         fetchData[name] = {
+    //             name: name,
+    //             url: url,
+    //             data: undefined,
+    //         }
+    //         return null;
+    //     } else if (fetchData[name].url != url) {
+    //         throw Error(`Same Name [${name}] With Different Url [${fetchData[name].url}, ${url}]`)
+    //     } else if (fetchData[name].data !== undefined) {
+    //         return fetchData[name].data;
+    //     } else {
+    //         return null;
+    //     }
+    // }
+    ev.createFetch = function() {
+        return function(name, url) {
+            if (typeof this.setState !== "function") {
+                throw Error("Fetch Function Must Bind To React Element");
             }
-            return null;
-        } else if (fetchData[name].url != url) {
-            throw Error(`Same Name [${name}] With Different Url [${fetchData[name].url}, ${url}]`)
-        } else if (fetchData[name].data !== undefined) {
-            return fetchData[name].data;
-        } else {
-            return null;
+            var that = this;
+
+            function cb(res) {
+                var state = {};
+                state[name] = res;
+                that.setState(state);
+            }
+            if (!fetchData[name]) {
+                fetchData[name] = {
+                    name: name,
+                    url: url,
+                    data: undefined,
+                    cb: cb,
+                }
+                return null;
+            } else if (fetchData[name].data !== undefined) {
+                // 已经处理过的
+                return fetchData[name].data;
+            } else if (fetchData[name].cb === undefined) {
+                // 服务端传来客户端还未处理
+                fetchData[name].cb = cb;
+                return null;
+            } else if (fetchData[name].url != url) {
+                // 重复注册且冲突的
+                throw Error(`Same Name [${name}] With Different Url [${fetchData[name].url}, ${url}]`)
+            } else {
+                return null;
+            }
         }
     }
 
