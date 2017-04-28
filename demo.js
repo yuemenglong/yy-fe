@@ -35,14 +35,13 @@ process.on("uncaughtException", function(err) {
     logger.error(JSON.stringify(err.stack));
 })
 
-app.get("/", function(req, res) {
-    res.render("App", { title: "yy-fe-测试" });
-})
-
 app.get("/test", function(req, res) {
     res.render("Test", { title: "yy-fe-测试" });
 })
 
+app.get("/*", function(req, res) {
+    res.render("App", { title: "yy-fe-测试" });
+})
 
 app.listen(80, function(err) {
     if (err) {

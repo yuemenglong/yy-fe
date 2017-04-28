@@ -2,6 +2,7 @@ var React = require("react");
 var Promise = require("bluebird");
 var ev = require("../ev");
 var P = require("path");
+var URL = require("URL");
 var logger = require("yy-logger");
 var URL = require("URL");
 var _ = require("lodash");
@@ -66,8 +67,8 @@ function swapAndRender(App, fetchData, request, response) {
             // 前端路由
             var routes = createRoutes(App);
             return new Promise(function(resolve, reject) {
-                var url = request.originalUrl;
-                match({ routes, url }, function(err, redirect, props) {
+                var location = request.originalUrl;
+                match({ routes, location }, function(err, redirect, props) {
                     if (err) {
                         reject(err);
                     } else if (redirect) {
