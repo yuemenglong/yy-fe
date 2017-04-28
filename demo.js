@@ -27,7 +27,7 @@ app.use("/upload", uploadMiddleware("static/files"));
 app.use(fetch); // fetch接口依赖的数据不需要transmit了,可能绕过权限
 app.use(bodyParser.json());
 app.use(transmit);
-// app.use(serverRender);
+app.use(serverRender);
 app.use(loggerMiddleware());
 app.use(errorMiddleware());
 

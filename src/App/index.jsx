@@ -4,7 +4,7 @@ var ReactDOM = require("react-dom");
 var ReactRouter = require("react-router");
 var Router = ReactRouter.Router;
 var Route = ReactRouter.Route;
-var browserHistory = ReactRouter.browserHistory;
+var hashHistory = ReactRouter.hashHistory;
 var IndexRoute = ReactRouter.IndexRoute;
 var Link = ReactRouter.Link;
 require("./style.less");
@@ -50,7 +50,7 @@ var About = React.createClass(new AboutClass());
 // var app = React.createElement(App);
 
 var route = jade(`
-Router(history={browserHistory})
+Router(history={hashHistory})
     Route(path="/" component={App})
         IndexRoute(component={Index})
         Route(path="/about" component={About})
