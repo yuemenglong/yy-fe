@@ -35,7 +35,7 @@ function fetchLoop() {
         } else if (res) {
             fetchLoop();
         } else {
-            setTimeout(fetchLoop, 1000);
+            setTimeout(fetchLoop, 50);
         }
     })
 }

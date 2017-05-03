@@ -5,22 +5,6 @@ function createRoot() {
     var fetchData = {};
     var window = global.window || {};
 
-    // ev.fetch = function(name, url) {
-    //     if (!fetchData[name]) {
-    //         fetchData[name] = {
-    //             name: name,
-    //             url: url,
-    //             data: undefined,
-    //         }
-    //         return null;
-    //     } else if (fetchData[name].url != url) {
-    //         throw Error(`Same Name [${name}] With Different Url [${fetchData[name].url}, ${url}]`)
-    //     } else if (fetchData[name].data !== undefined) {
-    //         return fetchData[name].data;
-    //     } else {
-    //         return null;
-    //     }
-    // }
     ev.createFetch = function() {
         return function(name, url) {
             if (typeof this.setState !== "function") {
@@ -31,6 +15,7 @@ function createRoot() {
             function cb(res) {
                 var state = {};
                 state[name] = res;
+                ev.env[name] = res;
                 that.setState(state);
             }
             if (!fetchData[name]) {
@@ -55,6 +40,9 @@ function createRoot() {
                 return null;
             }
         }
+    }
+    ev.clearFetch = function(name) {
+        delete fetchData[name];
     }
 
     ev.getFetchData = function() {
