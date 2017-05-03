@@ -28,6 +28,7 @@ var LessPlugin = Build.LessPlugin;
 var PathPlugin = Build.PathPlugin;
 
 var defaultMap = {
+    "bootstrap": "//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.min.css",
     "react": "//cdn.bootcss.com/react/0.14.9/react.js",
     "react-dom": "//cdn.bootcss.com/react/0.14.9/react-dom.js",
     "react-router": "//cdn.bootcss.com/react-router/2.8.1/ReactRouter.min.js",
@@ -46,15 +47,18 @@ module.exports = function(dirname, requireMap) {
     if (!dirname || !requireMap) {
         throw Error("Need __dirname And requireMap Arguments");
     }
+    requireMap = _.merge({}, defaultMap, requireMap);
     var serverExclude = _.toPairs(requireMap).filter(function(pair) {
-        // 以单斜杠开头的都是只能用在客户端的
+        // 以单斜杠开头的
+        // 不以js结尾的
+        // 都是只能用在客户端的
+        // null的不能过滤
         return _([pair[1]]).flattenDeep().some(function(url) {
-            return /^\/[^/]/.test(url);
+            return url != null && (/^\/[^/]/.test(url) || !/(\.js)$/.test(url));
         })
     }).map(function(pair) {
         return pair[0];
     });
-    requireMap = _.merge(defaultMap, requireMap);
 
     function resolve(path) {
         return P.resolve(dirname, path);
