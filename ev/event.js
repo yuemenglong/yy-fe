@@ -102,16 +102,17 @@ EventEmitterEx.prototype.set = function(key, value) {
     this.env[key] = value;
 }
 
-EventEmitterEx.prototype.get = function(key, dft) {
-    if (this.env[key] === undefined) {
-        if (dft === undefined) {
-            throw Error(`Can't Get [${key}] From Ev, Maybe Need A Default Value`);
-        } else {
-            return dft;
-        }
-    } else {
-        return this.env[key];
-    }
+EventEmitterEx.prototype.get = function(key) {
+    return this.env[key];
+    // if (this.env[key] === undefined) {
+    //     if (dft === undefined) {
+    //         throw Error(`Can't Get [${key}] From Ev, Maybe Need A Default Value`);
+    //     } else {
+    //         return dft;
+    //     }
+    // } else {
+    //     return this.env[key];
+    // }
 }
 
 module.exports = EventEmitterEx;

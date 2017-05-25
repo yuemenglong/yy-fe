@@ -40,17 +40,6 @@ module.exports = function(dirname, host, port) {
                     return response.status(500).json({ name: err.name, message: err.message, detail: err.detail });
                 }
             });
-            // ev.doServerFetch = function(request, response, fetchFn, fn) 
-            // serverFetch(request, response, fetchData, fetchFn, function(err, res) {
-            //     if (err) {
-            //         logger.error(JSON.stringify(err.stack));
-            //         response.status(500).json(err);
-            //     } else {
-            //         opt.html = swapAndRender(fetchData, win, App);
-            //         opt.init = _.defaults({ ev: fetchData }, opt.init);
-            //         render(appName, opt)
-            //     }
-            // });
         }
         next();
         // return renderToStaticMarkup(app);
@@ -97,8 +86,6 @@ function serverFetch(fetchData, fetchFn, request, response, fn) {
     }).value();
     if (!list.length) {
         return Promise.resolve(null);
-        // fn(null, null);
-        // return;
     }
     var query = _(list).map(function(item) {
         return [item.name, item.url];
@@ -107,7 +94,6 @@ function serverFetch(fetchData, fetchFn, request, response, fn) {
         fetchFn(query, request, response, function(err, res) {
             if (err) {
                 return reject(err);
-                // return fn(err, res);
             }
             _.keys(res).map(function(name) {
                 fetchData[name].data = res[name];
