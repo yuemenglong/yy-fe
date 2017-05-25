@@ -43,6 +43,8 @@ app.get("/*", function(req, res) {
     res.render("App", { title: "yy-fe-测试" });
 })
 
+serverRender.transmit("/")
+
 app.listen(80, function(err) {
     if (err) {
         logger.error(JSON.stringify(err));

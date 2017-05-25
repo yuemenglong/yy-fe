@@ -13,10 +13,12 @@ var createRoutes = ReactRouter.createRoutes;
 var fetchMiddleware = require("../middleware/fetch");
 var renderToStaticMarkup = require('react-dom/server').renderToStaticMarkup;
 
+var transmit = {}
+
 module.exports = function(dirname, host, port) {
     var fetchFn = fetchMiddleware.createFetch(host, port);
     // return function(appName, request, response, opt) {
-    return function(request, response, next) {
+    var ret = function(request, response, next) {
         var render = response.render.bind(response);
         response.render = function(appName, opt) {
             var appPath = P.resolve(dirname, "dist", appName);
@@ -45,10 +47,17 @@ module.exports = function(dirname, host, port) {
         next();
         // return renderToStaticMarkup(app);
     }
+    ret.transmit = function(url) {
+        transmit[url] = true;
+    }
+    return ret;
 }
 
 function pickOpt(fetchData, dft) {
-    var opt = { title: fetchData["$title"].data, meta: fetchData["$meta"].data }
+    var opt = {
+        title: _.get(fetchData, "$title.data", null),
+        meta: _.get(fetchData, "$meta.data", []),
+    }
     delete fetchData["$title"]
     delete fetchData["$meta"]
     opt.init = { ev: fetchData }
@@ -93,14 +102,16 @@ function serverFetch(fetchData, fetchFn, request, response, fn) {
     var list = _(fetchData).values().filter(function(item) {
         return item.data === undefined;
     }).value();
-    if (!list.length) {
-        return Promise.resolve(null);
-    }
     var query = _(list).map(function(item) {
         return [item.name, item.url];
     }).fromPairs().value();
     // 加入本来这个页面的fetch
-    query["$init"] = request.originalUrl;
+    if (transmit[request.path]) {
+        query["$init"] = request.originalUrl;
+    }
+    if (!_.keys(query).length) {
+        return Promise.resolve(null);
+    }
     return new Promise(function(resolve, reject) {
         fetchFn(query, request, response, function(err, res) {
             if (err) {
