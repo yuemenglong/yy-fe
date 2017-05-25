@@ -27,8 +27,9 @@ module.exports = function(dirname, host, port) {
             }).then(function(res) {
                 return swapAndRender(App, fetchData, request, response);
             }).then(function(html) {
+                var opt = pickOpt(fetchData)
                 opt.html = html;
-                opt.init = _.defaults({ ev: fetchData }, opt.init);
+                // opt.init = _.defaults({ ev: fetchData }, opt.init);
                 return render(appName, opt)
             }).catch(function(err) {
                 if (err.type == "REDIRECT") {
@@ -44,6 +45,14 @@ module.exports = function(dirname, host, port) {
         next();
         // return renderToStaticMarkup(app);
     }
+}
+
+function pickOpt(fetchData, dft) {
+    var opt = { title: fetchData["$title"].data, meta: fetchData["$meta"].data }
+    delete fetchData["$title"]
+    delete fetchData["$meta"]
+    opt.init = { ev: fetchData }
+    return _.merge(opt, dft)
 }
 
 function swapAndRender(App, fetchData, request, response) {
@@ -90,14 +99,22 @@ function serverFetch(fetchData, fetchFn, request, response, fn) {
     var query = _(list).map(function(item) {
         return [item.name, item.url];
     }).fromPairs().value();
+    // 加入本来这个页面的fetch
+    query["$init"] = request.originalUrl;
     return new Promise(function(resolve, reject) {
         fetchFn(query, request, response, function(err, res) {
             if (err) {
                 return reject(err);
             }
             _.keys(res).map(function(name) {
-                fetchData[name].data = res[name];
-                // that.env[name] = res[name]; // 通过get可以拿到
+                if ("$init" == name) {
+                    // 打平存入fetchData，因为下一次渲染要使用
+                    _.toPairs(res[name]).map(function(pair) {
+                        fetchData[pair[0]] = { data: pair[1] }
+                    })
+                } else {
+                    fetchData[name].data = res[name];
+                }
             });
             return resolve(res);
             // fn(null, res);

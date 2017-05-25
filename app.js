@@ -53,6 +53,9 @@ app.listen(80, function(err) {
 
 var be = express();
 be.use(loggerMiddleware());
+be.get("/", function(req, res) {
+    res.json({ "$title": "PageTitle", "$meta": [{ content: "ISO-9001" }], pageData: "Load Page Succ" });
+})
 be.get("/fetch-data", function(req, res) {
     res.json({ status: "succ" });
 })
