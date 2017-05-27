@@ -1,4 +1,4 @@
-var createTransmit = require("./transmit").createTransmit;
+var Transmit = require("../util").Transmit;
 
 module.exports = function(host, port) {
     return function(req, res, next) {
@@ -7,7 +7,7 @@ module.exports = function(host, port) {
             return next();
         }
         var render = res.render.bind(res);
-        var handler = createTransmit(host, port, function(err, body) {
+        var transmit = Transmit(host, port, function(err, body) {
             if (err) {
                 res.status(500).end(err);
             } else {
@@ -23,6 +23,6 @@ module.exports = function(host, port) {
                 next();
             }
         });
-        handler(req, res)
+        transmit(req, res)
     }
 }

@@ -8,7 +8,7 @@ if (global.window) {
     // 前端渲染使用
     var init = window.__INITIAL_STATE__ || {};
     // 用fetchData初始化ev
-    ev.setFetchData(init.ev || {});
+    ev.setFetchData(init.fetchData || {});
     // 同时初始化env
     ev.env = _(ev.getFetchData()).values().map(function(item) {
         return [item.name, item.data];
@@ -59,7 +59,11 @@ function browserFetch(fn) {
             _.keys(res).map(function(name) {
                 fetchData[name].data = res[name];
                 fetchData[name].cb(res[name]);
-            })
+            });
+            // 同时将数据同步到ev上
+            _.toPairs(fetchData).map(function(pair) {
+                ev.env[pair[0]] = pair[1].data
+            });
             fn(null, res);
         },
         error: function(err) {

@@ -1,4 +1,4 @@
-var createTransmit = require("./transmit").createTransmit;
+var Transmit = require("../util").Transmit;
 var _ = require("lodash");
 var Promise = require("bluebird");
 
@@ -26,7 +26,7 @@ function createFetch(host, port) {
             return new Promise(function(resolve, reject) {
                 var key = pair[0];
                 var path = pair[1];
-                var handler = createTransmit(host, port, function(err, body) {
+                var transmit = Transmit(host, port, function(err, body) {
                     if (err) {
                         err = JSON.parse(err);
                         err.detail = key;
@@ -35,7 +35,7 @@ function createFetch(host, port) {
                         resolve([key, JSON.parse(body)]);
                     }
                 }, { path: path, headers: { "X-Requested-With": "XMLHttpRequest" } });
-                handler(request, response);
+                transmit(request, response);
             })
         }).then(function(res) {
             var result = _.fromPairs(res);

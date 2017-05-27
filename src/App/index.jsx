@@ -25,11 +25,14 @@ function AppClass() {
 function IndexClass() {
     this.fetch = ev.createFetch();
     this.getInitialState = function() {
-        return { fetch: this.fetch("fetch", "/fetch-data") || {} };
+        return {
+            fetch: this.fetch("fetch", "/fetch-data") || {},
+            data: ev.get("data") || ""
+        };
     }
     this.render = function() {
         return jade(`
-        h1 Index {this.state.fetch.status}`);
+        h1 Index {this.state.fetch.status} And Data: {this.state.data}`);
     };
 }
 

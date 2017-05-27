@@ -6,16 +6,14 @@ var bodyParser = require('body-parser');
 
 var fe = require(".");
 
-var transmitMiddleware = fe.middleware.transmit;
 var uploadMiddleware = fe.middleware.upload;
 var loggerMiddleware = fe.middleware.logger;
 var errorMiddleware = fe.middleware.error;
 var fetchMiddleware = fe.middleware.fetch;
 var serverRenderMiddleware = fe.middleware.serverRender;
 
-var transmit = transmitMiddleware("localhost", 8080);
 var fetch = fetchMiddleware("localhost", 8080);
-var serverRender = serverRenderMiddleware(__dirname, "localhost", 8080);
+var render = serverRenderMiddleware(__dirname, "localhost", 8080);
 
 var app = express();
 app.set('views', __dirname + '/jade');
@@ -26,8 +24,6 @@ app.use('/static', express.static(__dirname + '/static'));
 app.use("/upload", uploadMiddleware("static/files"));
 app.use(fetch); // fetch接口依赖的数据不需要transmit了,可能绕过权限
 app.use(bodyParser.json());
-app.use(transmit);
-app.use(serverRender);
 app.use(loggerMiddleware());
 app.use(errorMiddleware());
 
@@ -39,11 +35,9 @@ app.get("/test", function(req, res) {
     res.render("Test", { title: "yy-fe-测试" });
 })
 
-app.get("/*", function(req, res) {
-    res.render("App", { title: "yy-fe-测试" });
-})
-
-serverRender.transmit("/")
+app.get("/*", render(function(req, res) {
+    res.render("App");
+}, true))
 
 app.listen(80, function(err) {
     if (err) {
@@ -56,7 +50,7 @@ app.listen(80, function(err) {
 var be = express();
 be.use(loggerMiddleware());
 be.get("/", function(req, res) {
-    res.json({ "$title": "PageTitle", "$meta": [{ content: "ISO-9001" }], pageData: "Load Page Succ" });
+    res.json({ "$title": "PageTitle", "$meta": [{ content: "ISO-9001" }], data: "Load Page Succ" });
 })
 be.get("/fetch-data", function(req, res) {
     res.json({ status: "succ" });

@@ -3,16 +3,16 @@ var http = require("http");
 var logger = require("yy-logger");
 var iconv = require('iconv-lite');
 var _ = require("lodash");
-var formatReq = require("../util").formatReq;
-var formatRes = require("../util").formatRes;
+var formatReq = require("./format").formatReq;
+var formatRes = require("./format").formatRes;
 
 function getMessage(status) {
     return `后台服务出错(${status})，请按F5刷新后重试`;
 }
 
-function createTransmit(host, port, fn, opt) {
+function Transmit(host, port, fn, opt) {
     opt = opt || {}
-    return function(req, res) {
+    var transmit = function(req, res) {
         function errorHandler(err) {
             logger.error(JSON.stringify(err.stack));
             res.status(500).end(JSON.stringify({ name: err.name, message: err.message }));
@@ -77,81 +77,14 @@ function createTransmit(host, port, fn, opt) {
         logger.info(formatReq(req, JSON.stringify(req.body)));
         backendReq.end(JSON.stringify(req.body));
     }
+    transmit.ajax = function(req, res, next) {
+        if (req.xhr) {
+            transmit(req, res)
+        } else {
+            next()
+        }
+    }
+    return transmit;
 }
 
-function transmit(host, port) {
-    var handler = createTransmit(host, port);
-
-    function mergeRegex(arr) {
-        if (!arr.length) {
-            return;
-        }
-        var buf = arr.join(")|(");
-        buf = `(${buf})`;
-        return new RegExp(buf);
-    }
-
-    function normalizeUrl(url) {
-        return "^" + url.replace(/\*/g, ".*").replace(/:[^/]*/g, "[^/]*") + "$";
-    }
-
-    function retFunc(req, res, next) {
-        if (!req) {
-            console.log(req, res, next);
-        }
-        var method = req.method;
-        //不透传
-        if (excludeRegex && excludeRegex.test(req.path)) {
-            return next();
-        }
-        //全类型
-        if (_both[method] && _both[method].test(req.path)) {
-            return handler(req, res);
-        }
-        //http和ajax
-        if (req.xhr && _ajax[method] && _ajax[method].test(req.path)) {
-            return handler(req, res);
-        } else if (!req.xhr && _http[method] && _http[method].test(req.path)) {
-            return handler(req, res);
-        }
-        return next();
-    }
-
-    var _both = {};
-    var _http = {};
-    var _ajax = {};
-    ["get", "post", "put", "delete"].map(function(method) {
-        _both[method] = _both[method] || [];
-        retFunc[method] = function(url) {
-            url = normalizeUrl(url);
-            _both[method].push(url);
-            _both[method.toUpperCase()] = mergeRegex(_both[method]);
-        }
-
-        _http[method] = _http[method] || [];
-        retFunc["http" + _.upperFirst(method)] = function(url) {
-            url = normalizeUrl(url);
-            _http[method].push(url);
-            _http[method.toUpperCase()] = mergeRegex(_http[method]);
-        }
-
-        _ajax[method] = _ajax[method] || [];
-        retFunc["ajax" + _.upperFirst(method)] = function(url) {
-            url = normalizeUrl(url);
-            _ajax[method].push(url);
-            _ajax[method.toUpperCase()] = mergeRegex(_ajax[method]);
-        }
-    })
-
-    var _exclude = [];
-    var excludeRegex = null;
-    retFunc.exclude = function(url) {
-        url = normalizeUrl(url);
-        _exclude.push(url);
-        excludeRegex = mergeRegex(_exclude);
-    }
-    return retFunc;
-}
-
-module.exports = transmit;
-module.exports.createTransmit = createTransmit;
+module.exports = Transmit;
