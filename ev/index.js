@@ -1,4 +1,5 @@
 var EventEmitterEx = require("./event");
+var util = require("util");
 
 function createRoot() {
     var ev = new EventEmitterEx();
@@ -35,7 +36,9 @@ function createRoot() {
                 return null;
             } else if (fetchData[name].url != url) {
                 // 重复注册且冲突的
-                throw Error(`Same Name [${name}] With Different Url [${fetchData[name].url}, ${url}]`)
+                var err = util.format("Same Name [%s] With Different Url [%s, %s]", name, fetchData[name].url, url);
+                // throw Error(`Same Name [${name}] With Different Url [${fetchData[name].url}, ${url}]`)
+                throw Error(err)
             } else {
                 return null;
             }

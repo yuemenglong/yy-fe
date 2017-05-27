@@ -13,6 +13,7 @@ function ExcludePlugin(exclude) {
     exclude.push(".*\\.less");
     //默认过滤以//开头的
     exclude.push("^//.*");
+    exclude.push("^/.*");
     var pattern = "^((" + exclude.join(")|(") + "))$";
     this.test = new RegExp(pattern);
     this.transform = function(file, requireNodes) {
