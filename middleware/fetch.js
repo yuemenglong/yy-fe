@@ -28,7 +28,6 @@ function createFetch(host, port) {
                 var path = pair[1];
                 var transmit = Transmit(host, port, function(err, body) {
                     if (err) {
-                        err = JSON.parse(err);
                         err.detail = key;
                         reject(err)
                     } else {

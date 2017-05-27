@@ -45,6 +45,7 @@ module.exports = function(dirname, host, port) {
                     } else if (err.type == "NOT_FOUND") {
                         return response.status(404).end();
                     } else {
+                        logger.error(JSON.stringify(err.stack))
                         return response.status(500).json({ name: err.name, message: err.message, detail: err.detail });
                     }
                 });

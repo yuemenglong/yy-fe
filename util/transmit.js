@@ -10,6 +10,20 @@ function getMessage(status) {
     return `后台服务出错(${status})，请按F5刷新后重试`;
 }
 
+function error(body, status) {
+    try {
+        var json = JSON.parse(body)
+        var err = new Error(json.name)
+        _.merge(err, json)
+        return err;
+    } catch (ex) {
+        var err = new Error("ERROR_" + status);
+        err.message = getMessage(status);
+        err.detail = body;
+        return err;
+    }
+}
+
 function Transmit(host, port, fn, opt) {
     opt = opt || {}
     var transmit = function(req, res) {
@@ -38,7 +52,7 @@ function Transmit(host, port, fn, opt) {
                     req._originalUrl = opt.path; // 为了打日志 
                     logger.error(formatRes(req, backendRes, body));
                     if (fn) {
-                        return fn(body, null);
+                        return fn(error(body, backendRes.statusCode), null);
                     }
                     try {
                         var err = JSON.parse(body);
