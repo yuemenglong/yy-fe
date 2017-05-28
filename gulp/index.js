@@ -27,6 +27,8 @@ var JadePlugin = Build.JadePlugin;
 var LessPlugin = Build.LessPlugin;
 var PathPlugin = Build.PathPlugin;
 
+var Transform = require("./transform")
+
 var defaultMap = {
     "bootstrap": "//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css",
     "react": "//cdn.bootcss.com/react/0.14.9/react.js",
@@ -114,16 +116,19 @@ module.exports = function(dirname, requireMap) {
     var apps = getApps();
 
     function build() {
-        var build = new Build();
-        build.plugin(new PathPlugin(dirname));
-        build.plugin(new ImgPlugin());
+        var trans = new Transform(dirname)
+        trans.pack(/.*/)
+            // var build = new Build();
+            // build.plugin(new PathPlugin(dirname));
+            // build.plugin(new ImgPlugin());
         var buildTask = gulp.src(resolve("src/**/*.jsx"))
             .pipe(jadeToJsx())
             .on("error", errorHandler)
             .pipe(addsrc([resolve("src/**/*.js")]))
             .pipe(babel({ presets: ['react'] }))
             .pipe(rename({ extname: ".js" }))
-            .pipe(build())
+            .pipe(trans.gulp())
+            // .pipe(build())
             .pipe(addsrc([resolve("src/**/*.less"), resolve("src/**/*.json")]))
             .pipe(gulp.dest(resolve("build")));
         return buildTask;
