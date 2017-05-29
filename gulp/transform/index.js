@@ -16,6 +16,7 @@ var LessPlugin = require("./lib/less-plugin");
 var PathPlugin = require("./lib/path-plugin");
 
 var transformPath = require("./transform-path");
+var transformImg = require("./transform-img");
 
 var requirePattern = /^.*require\((['"]).+\1\).*$/gm;
 var pathPattern = /.*require\((['"])(.+)\1\).*/;
@@ -48,6 +49,16 @@ function getRequirementNodes(ast) {
     return ret;
 }
 
+function checkDirnameValid(dirname) {
+    var dirs = fs.readdirSync(dirname);
+    var valid = dirs.some(function(dir) {
+        return dir == "node_modules";
+    })
+    if (!valid) {
+        throw new Error("Invalid Root Location, Can't Find node_modules");
+    }
+    return valid;
+}
 
 function match(patList, str) {
     for (var i in patList) {
@@ -63,6 +74,8 @@ function match(patList, str) {
 ///////////////////////////////////////////////////
 
 function Transform(dirname) {
+    checkDirnameValid(dirname)
+
     function transform(file, content) {
         console.log(`Build File: [${file}]`);
         var fileName = P.basename(file);
@@ -89,15 +102,18 @@ function Transform(dirname) {
         for (var i in nodes) {
             var node = nodes[i];
             var requirePath = getNodeValue(node);
-            if (match(cut, requirePath)) {
+            if (enablePath && requirePath[0] == "/") {
+                transformPath(dirname, file, node)
+            } else if (enableBase64 && /(\.png)|(\.gif)$/.test(requirePath)) {
+                transformImg(file, node)
+            } else if (match(cut, requirePath)) {
                 cutNode(node)
-            } else if (match(pack, requirePath)) {
+            } else if (match(persist, requirePath)) {
                 // nothing
-            } else {
+            } else if (requirePath[0] != ".") {
                 throw new Error("Unknown Require Path: " + requirePath)
             }
         }
-        transformPath(dirname, file, nodes)
 
         // plugins.forEach(function(plugin) {
         //     var matches = nodes.filter(function(node) {
@@ -129,23 +145,40 @@ function Transform(dirname) {
     this.cut = function(list) {
         // 删掉
     }
-    var pack = [];
-    this.pack = function(list) {
-        // 打包
-        pack = _.concat(pack, list)
+    var persist = [];
+    this.persist = function(list) {
+        // 保留
+        persist = _.concat(persist, list)
     }
-    var base64 = [];
-    this.base64 = function(list) {
-        // 展开base64
-    }
+
     var script = {};
     this.script = function(map) {
         // jade里引用
     }
-    var ignore = [];
+    var ignore = [/.*\.json/];
     this.ignore = function(list) {
         // 不处理,比如json
     }
+
+    var enablePath = false;
+    this.enablePath = function() {
+        enablePath = true;
+    }
+    var enableBase64 = false;
+    this.enableBase64 = function() {
+        enableBase64 = true;
+    }
+}
+
+Transform.build = function(dirname) {
+    var trans = new Transform(dirname);
+    // 路径展开
+    trans.enablePath();
+    // base64展开
+    trans.enableBase64();
+    // 保留所有
+    trans.persist(/.*/);
+    return trans;
 }
 
 

@@ -11,17 +11,17 @@ function root(path) {
     return path;
 }
 
-function checkCwdValid(cwd) {
-    // var cwd = process.cwd();
-    var dirs = fs.readdirSync(cwd);
-    var valid = dirs.some(function(dir) {
-        return dir == "node_modules";
-    })
-    if (!valid) {
-        throw new Error("Invalid Root Location, Can't Find node_modules");
-    }
-    return valid;
-}
+// function checkCwdValid(cwd) {
+//     // var cwd = process.cwd();
+//     var dirs = fs.readdirSync(cwd);
+//     var valid = dirs.some(function(dir) {
+//         return dir == "node_modules";
+//     })
+//     if (!valid) {
+//         throw new Error("Invalid Root Location, Can't Find node_modules");
+//     }
+//     return valid;
+// }
 
 // function PathPlugin(cwd) {
 //     this.transform = function(file, requireNodes) {
@@ -40,14 +40,16 @@ function getRelativePath(cwd, filePath, requirePath) {
     return relative;
 }
 
-function transformPath(dirname, file, requireNodes) {
-    checkCwdValid(dirname);
-    requireNodes.map(function(node) {
-        var path = getNodeValue(node);
-        if (path[0] != "/") return
-        var relativePath = getRelativePath(dirname, file, path)
-        setNodeValue(node, relativePath);
-    })
+function transformPath(dirname, file, node) {
+    // checkCwdValid(dirname);
+    // requireNodes.map(function(node) {
+    var path = getNodeValue(node);
+    var relativePath = getRelativePath(dirname, file, path)
+    if (relativePath[0] != ".") {
+        relativePath = "./" + relativePath
+    }
+    setNodeValue(node, relativePath);
+    // })
 }
 
 module.exports = transformPath;

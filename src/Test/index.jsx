@@ -1,5 +1,8 @@
 var React = require("react");
 var ev = require("yy-fe/ev");
+var icon = require("./lib/quit.png")
+require("/Test/lib/index");
+
 require("./style.less");
 
 function ThirdClass() {

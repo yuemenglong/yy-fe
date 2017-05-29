@@ -116,8 +116,7 @@ module.exports = function(dirname, requireMap) {
     var apps = getApps();
 
     function build() {
-        var trans = new Transform(dirname)
-        trans.pack(/.*/)
+        var trans = Transform.build(dirname)
             // var build = new Build();
             // build.plugin(new PathPlugin(dirname));
             // build.plugin(new ImgPlugin());
