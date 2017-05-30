@@ -6,14 +6,6 @@ var stream = require("stream");
 var esprima = require("esprima");
 var escodegen = require("escodegen");
 var estraverse = require("estraverse");
-var getValue = require("./lib/common").getValue;
-
-var DebugPlugin = require("./lib/debug-plugin");
-var ExcludePlugin = require("./lib/exclude-plugin");
-var ImgPlugin = require("./lib/img-plugin");
-var JadePlugin = require("./lib/jade-plugin");
-var LessPlugin = require("./lib/less-plugin");
-var PathPlugin = require("./lib/path-plugin");
 
 var transformPath = require("./transform-path");
 var transformImg = require("./transform-img");
@@ -234,123 +226,6 @@ Transform.onBundleFinish = function(browserify, cb) {
             cb()
         })
     })
-}
-
-
-function transform(file, content, plugins) {
-    console.log(`Build File: [${file}]`);
-    if (IGNORES.indexOf(P.extname(file)) >= 0) {
-        return content;
-    }
-    try {
-        // var ast = esprima.parse(content, { sourceType: "module" });
-        var ast = esprima.parse(content);
-    } catch (ex) {
-        var info = `Parse [${file}] Fail`;
-        var line = _.times(info.length, _.constant("-")).join("");
-        console.log(`+${line}+`);
-        console.log(`|${info}|`);
-        console.log(`+${line}+`);
-        throw ex;
-    }
-    var nodes = getRequirementNodes(ast);
-    plugins.forEach(function(plugin) {
-        var matches = nodes.filter(function(node) {
-            var value = getValue(node) || "";
-            return plugin.test.test(value);
-        })
-        if (matches.length === 0) {
-            return;
-        }
-        console.log(`Build Through: [${plugin.constructor.name}]`);
-        plugin.transform(file, matches, ast);
-    });
-    content = escodegen.generate(ast);
-    return content;
-}
-
-function wrapPlugin(ret) {
-    ret.plugin = function() {
-        ret.plugins = _.concat(ret.plugins, arguments);
-    }
-    ret.plugins = [];
-}
-
-function wrapEvent(obj, ret) {
-    obj.on("end", function() {
-        ret.plugins.map(function(o) {
-            if (o instanceof stream.Readable) {
-                o.push(null);
-            }
-        })
-    })
-}
-
-function Browserify(browserify) {
-    if (!browserify) {
-        throw new Error("Must Pass Browserify As Arguments When Use Prerequire Transform");
-    }
-    var DEBUG_DIR = null;
-
-    var ret = function(file, opt) {
-        var buf = [];
-        var obj = through(function(chunk, enc, cb) {
-            buf.push(chunk);
-            return cb();
-        }, function(cb) {
-            var content = Buffer.concat(buf).toString();
-            content = transform(file, content, ret.plugins);
-            this.push(new Buffer(content));
-            if (DEBUG_DIR) {
-                var relative = P.relative(DEBUG_DIR, file);
-                var debugDir = P.resolve(DEBUG_DIR, "bundle-debug");
-                fs.mkdirSync(debugDir);
-                var debugFile = P.resolve(debugDir, relative);
-                // var debugFile = `${file}.bundle`;
-                console.log(`Write Bundle Debug To [${debugFile}]`);
-                fs.writeFileSync(debugFile, content);
-            }
-            return cb();
-        });
-        // wrapEvent(obj, ret);
-        return obj;
-    }
-    ret.debug = function(dirname) {
-        console.log("debug", dirname);
-        if (!dirname) {
-            throw Error("Call Debug Must With Dirname");
-        }
-        DEBUG_DIR = dirname;
-    }
-
-    wrapPlugin(ret);
-    browserify.on('bundle', function(bundle) {
-        bundle.on("end", function() {
-            ret.plugins.map(function(o) {
-                if (o instanceof stream.Readable) {
-                    o.push(null);
-                }
-            })
-        })
-    })
-    browserify.transform(ret);
-    return ret;
-}
-
-function Build() {
-    var ret = function() {
-        var obj = through.obj(function(file, enc, cb) {
-            var filePath = _.nth(file.history, -1);
-            var content = transform(filePath, file.contents.toString(), ret.plugins);
-            file.contents = new Buffer(content);
-            this.push(file);
-            return cb();
-        });
-        // wrapEvent(obj, ret);
-        return obj;
-    }
-    wrapPlugin(ret);
-    return ret;
 }
 
 module.exports = Transform;
