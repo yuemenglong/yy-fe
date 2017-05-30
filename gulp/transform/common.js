@@ -12,7 +12,7 @@ function replaceNode(node, content) {
     node.raw = `"${content}"`;
 }
 
-function cutNode(node) {
+function clearNode(node) {
     while (node.$parent) {
         node = node.$parent;
         if (node.type == "VariableDeclaration" ||
@@ -25,4 +25,4 @@ function cutNode(node) {
     throw new Error("Can't Find Node Parent Which Can Clear");
 }
 
-module.exports = { getNodeValue, setNodeValue, replaceNode, cutNode }
+module.exports = { getNodeValue, setNodeValue, replaceNode, clearNode }

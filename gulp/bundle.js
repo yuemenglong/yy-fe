@@ -1,7 +1,7 @@
 var React = require("react");
 var ReactDOM = require("react-dom");
 var _ = require("lodash");
-var ev = require("yy-fe/ev"); // 这里极其特殊，因为这个文件是通过分发出去的，路径不在这里
+var ev = require("yy-fe/ev"); // 这里极其特殊，因为这个文件是通过复制分发出去的，路径不在这里
 
 if (global.window) {
     $.ajaxSetup({ contentType: "application/json; charset=utf-8" });

@@ -17,6 +17,8 @@ var PathPlugin = require("./lib/path-plugin");
 
 var transformPath = require("./transform-path");
 var transformImg = require("./transform-img");
+var TransformJade = require("./transform-jade");
+var TransformLess= require("./transform-less");
 
 var requirePattern = /^.*require\((['"]).+\1\).*$/gm;
 var pathPattern = /.*require\((['"])(.+)\1\).*/;
@@ -25,7 +27,7 @@ var useStrictPattern = /^(['"])use strict\1.*/g
 var getNodeValue = require("./common").getNodeValue
 var setNodeValue = require("./common").setNodeValue
 var replaceNode = require("./common").replaceNode
-var cutNode = require("./common").cutNode
+var clearNode = require("./common").clearNode
 
 function getRequirementNodes(ast) {
     var ret = [];
@@ -106,26 +108,16 @@ function Transform(dirname) {
                 transformPath(dirname, file, node)
             } else if (enableBase64 && /(\.png)|(\.gif)$/.test(requirePath)) {
                 transformImg(file, node)
-            } else if (match(cut, requirePath)) {
-                cutNode(node)
+            } else if (match(clear, requirePath)) {
+                clearNode(node)
             } else if (match(persist, requirePath)) {
                 // nothing
-            } else if (requirePath[0] != ".") {
-                throw new Error("Unknown Require Path: " + requirePath)
+            } else if (transformLess && /\.less$/.test(requirePath)) {
+                transformLess.transform(file, node)
+            } else if (transformJade && requirePath[0] != ".") {
+                transformJade.transform(file, node)
             }
         }
-
-        // plugins.forEach(function(plugin) {
-        //     var matches = nodes.filter(function(node) {
-        //         var value = getValue(node) || "";
-        //         return plugin.test.test(value);
-        //     })
-        //     if (matches.length === 0) {
-        //         return;
-        //     }
-        //     console.log(`Build Through: [${plugin.constructor.name}]`);
-        //     plugin.transform(file, matches, ast);
-        // });
     }
 
     this.gulp = function() {
@@ -139,27 +131,45 @@ function Transform(dirname) {
         return obj;
     }
     this.browserify = function() {
-
+        return function(file, opt) {
+            var buf = [];
+            var obj = through(function(chunk, enc, cb) {
+                buf.push(chunk);
+                return cb();
+            }, function(cb) {
+                var content = Buffer.concat(buf).toString();
+                content = transform(file, content);
+                this.push(new Buffer(content));
+                return cb();
+            });
+            return obj;
+        }
     }
-    var cut = [];
-    this.cut = function(list) {
+    var clear = [];
+    this.clear = function(list) {
         // 删掉
+        clear = _.concat(clear, list)
     }
     var persist = [];
     this.persist = function(list) {
         // 保留
         persist = _.concat(persist, list)
     }
-
-    var script = {};
-    this.script = function(map) {
-        // jade里引用
-    }
     var ignore = [/.*\.json/];
     this.ignore = function(list) {
         // 不处理,比如json
+        ignore = _.concat(ignore, list)
     }
 
+    var transformJade = null
+    this.enableJade = function(requireMap, appName, outputPath) {
+        // jade里引用
+        transformJade = new TransformJade(requireMap, appName, outputPath)
+    }
+    var transformLess = null
+    this.enableLess = function(outputPath) {
+        transformLess = new TransformLess(outputPath)
+    }
     var enablePath = false;
     this.enablePath = function() {
         enablePath = true;
@@ -167,6 +177,14 @@ function Transform(dirname) {
     var enableBase64 = false;
     this.enableBase64 = function() {
         enableBase64 = true;
+    }
+    this.output = function() {
+        if (transformJade) {
+            transformJade.output()
+        }
+        if (transformLess) {
+            transformLess.output()
+        }
     }
 }
 
@@ -179,6 +197,31 @@ Transform.build = function(dirname) {
     // 保留所有
     trans.persist(/.*/);
     return trans;
+}
+
+Transform.pack = function(dirname, requireMap, persistList, appName) {
+    if (arguments.length != 4) {
+        throw Error("Pack Need [dirname, requireMap, persistList, appName] Args")
+    }
+    var trans = new Transform(dirname);
+    trans.persist(persistList);
+    // jade and less
+    var jadePath = P.resolve(dirname, "jade", appName + ".jade")
+    var lessPath = P.resolve(dirname, "bundle", appName, "bundle.css")
+    trans.enableJade(requireMap, appName, jadePath)
+    trans.enableLess(lessPath)
+    return trans
+}
+
+Transform.onBundleFinish = function(browserify, cb) {
+    if (arguments.length != 2) {
+        throw Error("Need [browserify, cb] Args")
+    }
+    browserify.on('bundle', function(bundle) {
+        bundle.on("end", function() {
+            cb()
+        })
+    })
 }
 
 
@@ -302,4 +345,4 @@ module.exports = Transform;
 module.exports.setNodeValue = setNodeValue
 module.exports.getNodeValue = getNodeValue
 module.exports.replaceNode = replaceNode
-module.exports.cutNode = cutNode
+module.exports.clearNode = clearNode

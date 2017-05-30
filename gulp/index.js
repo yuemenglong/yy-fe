@@ -37,9 +37,8 @@ var defaultMap = {
     "lodash": "//cdn.bootcss.com/lodash.js/4.12.0/lodash.js",
     "bluebird": "//cdn.bootcss.com/bluebird/3.3.5/bluebird.js",
     "moment": "//cdn.bootcss.com/moment.js/2.13.0/moment.js",
-    "yy-fe/ev": null,
-    "events": null,
 }
+var persistList = ["yy-fe/ev", "events", "util"]
 
 function errorHandler(err) {
     console.log(err.stack);
@@ -151,18 +150,25 @@ module.exports = function(dirname, requireMap) {
             var src = replaceSrc(`${name}/bundle.js`, "build");
             var dest = replaceSrc(name, "bundle");
             var b = browserify(src);
-            var build = new Build.Browserify(b);
-            // build.debug(dirname);
-            var jp = new JadePlugin(requireMap, appName, `${appName}.jade`);
-            var lp = new LessPlugin("bundle.css");
-            build.plugin(jp);
-            build.plugin(lp);
-            var jadeDest = resolve("jade");
-            var bundleDest = resolve("bundle") + "/" + appName;
-            var jadeTask = jp.pipe(gulp.dest(jadeDest));
-            var lessTask = lp.pipe(gulp.dest(bundleDest));
-            jadeTasks.push(jadeTask);
-            lessTasks.push(lessTask);
+            var trans = Transform.pack(dirname, requireMap, persistList, appName)
+            b.transform(trans.browserify())
+            b.on('bundle', function(bundle) {
+                bundle.on("end", function() {
+                    trans.output()
+                })
+            });
+            // var build = new Build.Browserify(b);
+            // // build.debug(dirname);
+            // var jp = new JadePlugin(requireMap, appName, `${appName}.jade`);
+            // var lp = new LessPlugin("bundle.css");
+            // build.plugin(jp);
+            // build.plugin(lp);
+            // var jadeDest = resolve("jade");
+            // var bundleDest = resolve("bundle") + "/" + appName;
+            // var jadeTask = jp.pipe(gulp.dest(jadeDest));
+            // var lessTask = lp.pipe(gulp.dest(bundleDest));
+            // jadeTasks.push(jadeTask);
+            // lessTasks.push(lessTask);
             return b.bundle()
                 .pipe(source("bundle.js"))
                 .pipe(buffer())
