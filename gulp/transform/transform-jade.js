@@ -17,6 +17,7 @@ html
     head
         meta(charset="utf-8")
         title #{title}
+        meta(http-equiv="X-UA-Compatible" content="IE=edge")
         script(src="//cdn.bootcss.com/es5-shim/4.5.9/es5-shim.js")
         script(src="//cdn.bootcss.com/es5-shim/4.5.9/es5-sham.js")
         script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.js")

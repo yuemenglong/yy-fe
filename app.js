@@ -50,7 +50,10 @@ app.listen(80, function(err) {
 var be = express();
 be.use(loggerMiddleware());
 be.get("/", function(req, res) {
-    res.json({ "$title": "PageTitle", "$meta": [{ content: "ISO-9001" }], data: "Load Page Succ" });
+    res.json({ "$title": "Index Title", "$meta": [{ content: "ISO-9001" }], data: "Load Index Succ" });
+})
+be.get("/about", function(req, res) {
+    res.json({ "$title": "About Title", "$meta": [], data: "Load About Succ" });
 })
 be.get("/fetch-data", function(req, res) {
     res.json({ status: "succ" });
