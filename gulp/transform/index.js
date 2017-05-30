@@ -91,6 +91,8 @@ function Transform(dirname) {
         return content;
     }
 
+    var watchFiles = {};
+
     function transformAst(file, ast) {
         var nodes = getRequirementNodes(ast);
         for (var i in nodes) {
@@ -108,6 +110,14 @@ function Transform(dirname) {
                 transformLess.transform(file, node)
             } else if (transformJade && requirePath[0] != ".") {
                 transformJade.transform(file, node)
+            }
+            // 获取监控文件集合
+            if (requirePath[0] == ".") {
+                var rel = P.relative(dirname, file);
+                if (/^build/.test(rel)) {
+                    var abs = require.resolve(P.resolve(P.dirname(file), requirePath))
+                    watchFiles[abs] = true;
+                }
             }
         }
     }
@@ -177,6 +187,10 @@ function Transform(dirname) {
         if (transformLess) {
             transformLess.output()
         }
+    }
+
+    this.getWatchFiles = function() {
+        return _.keys(watchFiles)
     }
 }
 

@@ -120,26 +120,19 @@ module.exports = function(dirname, requireMap, persistList) {
     }
 
     function pack() {
-        var lessTasks = [];
-        var jadeTasks = [];
         var packTasks = apps.map(function(name) {
             var appName = clearSrc(name);
-            var src = replaceSrc(`${name}/bundle.js`, "build");
-            var dest = replaceSrc(name, "bundle");
+            var src = P.resolve(dirname, "build", appName, "bundle.js")
+            var dest = P.resolve(dirname, "bundle", appName)
             var b = browserify(src);
             var trans = Transform.pack(dirname, requireMap, persistList, appName)
             b.transform(trans.browserify())
-            b.on('bundle', function(bundle) {
-                bundle.on("end", function() {
-                    trans.output()
-                })
-            });
-            return b.bundle()
+            return b.bundle(() => trans.output())
                 .pipe(source("bundle.js"))
                 .pipe(buffer())
                 .pipe(gulp.dest(dest))
         })
-        return merge(packTasks.concat(jadeTasks).concat(lessTasks));
+        return merge(packTasks);
     }
 
     function dist() {
@@ -187,13 +180,83 @@ module.exports = function(dirname, requireMap, persistList) {
         done();
     }
 
+    function watch(done) {
+        var appName = process.argv.slice(-1)[0].slice(2);
+        var src = P.resolve(dirname, "build", appName, "bundle.js")
+        var dest = P.resolve(dirname, "bundle", appName)
+        var b = browserify(src);
+        var trans = Transform.pack(dirname, requireMap, persistList, appName)
+        b.transform(trans.browserify())
+
+        function startWatch() {
+            var buildFiles = trans.getWatchFiles();
+            var srcFiles = buildFiles.map(function(file) {
+                var rel = P.relative(dirname, file).replace(/^build/, "src");
+                var abs = P.resolve(dirname, rel)
+                if (/\.js$/.test(abs) && !fs.existsSync(abs)) {
+                    abs += "x"; // convert to jsx
+                }
+                return abs;
+            })
+
+            var srcWatcher = gulp.watch(srcFiles);
+            srcWatcher.on("change", onSrcChange)
+        }
+
+        function onSrcChange(path) {
+            var trans = Transform.build(dirname)
+            var output = P.dirname(replaceSrc(path, "build"));
+            console.log(`[${timeString()}] File Change: [${path}]`);
+            console.log(`[${timeString()}] Build Output: [${output}]`);
+            if (P.extname(path) == ".jsx") {
+                var stm = gulp.src(path)
+                    .pipe(jadeToJsx())
+                    .on("error", errorHandler)
+                    .pipe(babel({ presets: ["react"] }))
+                    .pipe(rename({ extname: ".js" }))
+                    .pipe(trans.gulp())
+                    .pipe(gulp.dest(output));
+            } else if (P.extname(path) == ".js") {
+                var stm = gulp.src(path).pipe(trans.gulp()).pipe(gulp.dest(output));
+            } else { //less ..
+                var stm = gulp.src(path).pipe(gulp.dest(output));
+            }
+            stm.on("finish", repack)
+        }
+
+        function repack() {
+            var src = P.resolve(dirname, "build", appName, "bundle.js")
+            var dest = P.resolve(dirname, "bundle", appName)
+            var b = browserify(src);
+            var trans = Transform.pack(dirname, requireMap, persistList, appName)
+            b.transform(trans.browserify())
+            return b.bundle(() => trans.output())
+                .pipe(source("bundle.js"))
+                .pipe(buffer())
+                .pipe(gulp.dest(dest))
+        }
+
+        b.bundle(startWatch)
+            .pipe(source("bundle.js"))
+            .pipe(buffer())
+            .pipe(gulp.dest(dest))
+
+    }
+
+    function timeString() {
+        var now = new Date();
+        return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
+    }
+
     function watchSrc(done) {
         var app = process.argv.slice(-1)[0].slice(2);
-        var watcher = gulp.watch([resolve("src/**/*.jsx"), resolve("src/**/*.js"), resolve("src/**/*.json"), ]);
-        watcher.on("change", function(path) {
-            var build = new Build();
-            build.plugin(new PathPlugin(dirname));
-            build.plugin(new ImgPlugin());
+        var srcWatcher = gulp.watch([
+            resolve("src/**/*.jsx"),
+            resolve("src/**/*.js"),
+            resolve("src/**/*.json"),
+        ]);
+        srcWatcher.on("change", function(path) {
+            var trans = Transform.build(dirname)
             var output = P.dirname(replaceSrc(path, "build"));
             console.log(`[${timeString()}] File Change: [${path}]`);
             console.log(`[${timeString()}] Build Output: [${output}]`);
@@ -203,10 +266,11 @@ module.exports = function(dirname, requireMap, persistList) {
                     .on("error", errorHandler)
                     .pipe(babel({ presets: ["react"] }))
                     .pipe(rename({ extname: ".js" }))
-                    .pipe(build())
+                    // .pipe(build())
+                    .pipe(trans.gulp())
                     .pipe(gulp.dest(output));
             } else {
-                gulp.src(path).pipe(build()).pipe(gulp.dest(output));
+                gulp.src(path).pipe(trans.gulp()).pipe(gulp.dest(output));
             }
         })
         var lessWatcher = gulp.watch([resolve("src/**/*.less")]);
@@ -215,22 +279,22 @@ module.exports = function(dirname, requireMap, persistList) {
             gulp.src(path).pipe(gulp.dest(output));
         })
         done();
-
-        function timeString() {
-            var now = new Date();
-            return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-        }
     }
 
     function watchBuild(done) {
         var app = process.argv.slice(-1)[0].slice(2);
-        var b = browserify(`${dirname}/build/${app}/bundle.js`, { cache: {}, packageCache: {} });
+        var bundlePath = P.resolve(dirname, "build", app, "bundle.js");
+        var outputPath = P.resolve(dirname, "build", app, "bundle.js");
+        console.log(bundlePath)
+        var b = browserify(bundlePath, { cache: {}, packageCache: {} });
         b.plugin(watchify);
         b.on("update", bundle);
-        var build = new Build.Browserify(b);
-        build.plugin(new ExcludePlugin(requireMap));
-        var lp = new LessPlugin("bundle.css");
-        build.plugin(lp);
+        var trans = Transform.pack(dirname, requireMap, persistList, app)
+        b.transform(trans.browserify())
+            // var build = new Build.Browserify(b);
+            // build.plugin(new ExcludePlugin(requireMap));
+            // var lp = new LessPlugin("bundle.css");
+            // build.plugin(lp);
         bundle(watchLess);
 
         function timeString() {
@@ -265,7 +329,8 @@ module.exports = function(dirname, requireMap, persistList) {
         done();
     }
 
-    gulp.task('watch', gulp.series(watchValidate, build, disp, pack, dist, watchSrc, watchBuild));
+    gulp.task('watch', gulp.series(watchValidate, all, watch));
+    // gulp.task('watch', gulp.series(watchValidate, build, disp, pack, dist, watchSrc, watchBuild));
 
     return gulp;
 }

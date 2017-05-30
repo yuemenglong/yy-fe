@@ -12,15 +12,13 @@ var getNodeValue = require("./common").getNodeValue;
 var clearNode = require("./common").clearNode;
 
 function TransformLess(outputPath) {
-    if(arguments.length != 1){
+    if (arguments.length != 1) {
         throw Error("Need [outputPath] Args")
     }
-    var imports = [];
     var lines = [];
     this.transform = function(file, node) {
         var path = getNodeValue(node);
         var abs = P.resolve(P.dirname(file), path);
-        imports.push(abs);
         var line = `@import '${abs.replace("\\", "\\\\")}';`;
         console.log(`[Less]: ${line}`);
         // that.push(line + "\n");
