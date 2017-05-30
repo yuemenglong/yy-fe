@@ -18,7 +18,7 @@ var PathPlugin = require("./lib/path-plugin");
 var transformPath = require("./transform-path");
 var transformImg = require("./transform-img");
 var TransformJade = require("./transform-jade");
-var TransformLess= require("./transform-less");
+var TransformLess = require("./transform-less");
 
 var requirePattern = /^.*require\((['"]).+\1\).*$/gm;
 var pathPattern = /.*require\((['"])(.+)\1\).*/;
@@ -189,6 +189,9 @@ function Transform(dirname) {
 }
 
 Transform.build = function(dirname) {
+    if (arguments.length != 1) {
+        throw Error("Pack Need [dirname] Args")
+    }
     var trans = new Transform(dirname);
     // 路径展开
     trans.enablePath();
@@ -211,6 +214,15 @@ Transform.pack = function(dirname, requireMap, persistList, appName) {
     trans.enableJade(requireMap, appName, jadePath)
     trans.enableLess(lessPath)
     return trans
+}
+
+Transform.dist = function(dirname) {
+    if (arguments.length != 1) {
+        throw Error("Pack Need [dirname] Args")
+    }
+    var trans = new Transform(dirname);
+    trans.clear([/\.less$/, /\.png$/]);
+    return trans;
 }
 
 Transform.onBundleFinish = function(browserify, cb) {

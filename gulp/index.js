@@ -19,14 +19,6 @@ var rename = require("gulp-rename");
 var addsrc = require('gulp-add-src');
 var merge = require('merge-stream');
 
-var Build = require("./build");
-var DebugPlugin = Build.DebugPlugin;
-var ExcludePlugin = Build.ExcludePlugin;
-var ImgPlugin = Build.ImgPlugin;
-var JadePlugin = Build.JadePlugin;
-var LessPlugin = Build.LessPlugin;
-var PathPlugin = Build.PathPlugin;
-
 var Transform = require("./transform")
 
 var defaultMap = {
@@ -38,28 +30,18 @@ var defaultMap = {
     "bluebird": "//cdn.bootcss.com/bluebird/3.3.5/bluebird.js",
     "moment": "//cdn.bootcss.com/moment.js/2.13.0/moment.js",
 }
-var persistList = ["yy-fe/ev", "events", "util"]
+var defaultList = ["yy-fe/ev", "events", "util"]
 
 function errorHandler(err) {
     console.log(err.stack);
 }
 
-module.exports = function(dirname, requireMap) {
-    if (!dirname || !requireMap) {
-        throw Error("Need __dirname And requireMap Arguments");
+module.exports = function(dirname, requireMap, persistList) {
+    if (arguments.length != 3) {
+        throw Error("Need [dirname, requireMap, persistList] Args")
     }
     requireMap = _.merge({}, defaultMap, requireMap);
-    var serverExclude = _.toPairs(requireMap).filter(function(pair) {
-        // 以单斜杠开头的
-        // 不以js结尾的
-        // 都是只能用在客户端的
-        // null的不能过滤
-        return _([pair[1]]).flattenDeep().some(function(url) {
-            return url != null && (/^\/[^/]/.test(url) || !/(\.js)$/.test(url));
-        })
-    }).map(function(pair) {
-        return pair[0];
-    });
+    persistList = _.merge([], defaultList, persistList);
 
     function resolve(path) {
         return P.resolve(dirname, path);
@@ -111,14 +93,10 @@ module.exports = function(dirname, requireMap) {
         return ret;
     }
 
-    Build.ignore(".json");
     var apps = getApps();
 
     function build() {
         var trans = Transform.build(dirname)
-            // var build = new Build();
-            // build.plugin(new PathPlugin(dirname));
-            // build.plugin(new ImgPlugin());
         var buildTask = gulp.src(resolve("src/**/*.jsx"))
             .pipe(jadeToJsx())
             .on("error", errorHandler)
@@ -126,7 +104,6 @@ module.exports = function(dirname, requireMap) {
             .pipe(babel({ presets: ['react'] }))
             .pipe(rename({ extname: ".js" }))
             .pipe(trans.gulp())
-            // .pipe(build())
             .pipe(addsrc([resolve("src/**/*.less"), resolve("src/**/*.json")]))
             .pipe(gulp.dest(resolve("build")));
         return buildTask;
@@ -157,18 +134,6 @@ module.exports = function(dirname, requireMap) {
                     trans.output()
                 })
             });
-            // var build = new Build.Browserify(b);
-            // // build.debug(dirname);
-            // var jp = new JadePlugin(requireMap, appName, `${appName}.jade`);
-            // var lp = new LessPlugin("bundle.css");
-            // build.plugin(jp);
-            // build.plugin(lp);
-            // var jadeDest = resolve("jade");
-            // var bundleDest = resolve("bundle") + "/" + appName;
-            // var jadeTask = jp.pipe(gulp.dest(jadeDest));
-            // var lessTask = lp.pipe(gulp.dest(bundleDest));
-            // jadeTasks.push(jadeTask);
-            // lessTasks.push(lessTask);
             return b.bundle()
                 .pipe(source("bundle.js"))
                 .pipe(buffer())
@@ -178,13 +143,13 @@ module.exports = function(dirname, requireMap) {
     }
 
     function dist() {
-        var build = new Build();
-        build.plugin(new ExcludePlugin(serverExclude));
-        return gulp.src([resolve("build/**/*.js"), resolve("build/**/*.json")]).pipe(build()).pipe(gulp.dest(`dist`));
+        var trans = Transform.dist(dirname)
+        return gulp.src([resolve("build/**/*.js"), resolve("build/**/*.json")])
+            .pipe(trans.gulp())
+            .pipe(gulp.dest(`dist`));
     }
 
     function clean(done) {
-        // return gulp.src(resolve("build")).pipe(path(del));
         console.log(`Clean ${resolve("build")}`);
         console.log(`Clean ${resolve("bundle")}`);
         console.log(`Clean ${resolve("jade")}`);
