@@ -157,9 +157,9 @@ function Transform(dirname) {
         // 保留
         persist = _.concat(persist, list)
     }
-    var ignore = [/.*\.json/];
+    var ignore = [/.*\.json$/, /.*\.less$/];
     this.ignore = function(list) {
-        // 不处理,比如json
+        // 不处理,比如json, less
         ignore = _.concat(ignore, list)
     }
 

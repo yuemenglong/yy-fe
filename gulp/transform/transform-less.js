@@ -29,6 +29,7 @@ function TransformLess(outputPath) {
         var src = lines.join("\n");
         less.render(src, function(err, output) {
             if (err) {
+                console.log(err)
                 throw err
             }
             fs.mkdirSync(P.dirname(outputPath))

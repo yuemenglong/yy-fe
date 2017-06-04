@@ -137,7 +137,7 @@ module.exports = function(dirname, requireMap, persistList) {
 
     function dist() {
         var trans = Transform.dist(dirname)
-        return gulp.src([resolve("build/**/*.js"), resolve("build/**/*.json")])
+        return gulp.src(resolve("build/**/*.*"))
             .pipe(trans.gulp())
             .pipe(gulp.dest(`dist`));
     }
@@ -196,6 +196,7 @@ module.exports = function(dirname, requireMap, persistList) {
                 if (/\.js$/.test(abs) && !fs.existsSync(abs)) {
                     abs += "x"; // convert to jsx
                 }
+                console.log("[Watch] " + abs)
                 return abs;
             })
 
@@ -206,6 +207,7 @@ module.exports = function(dirname, requireMap, persistList) {
         function onSrcChange(path) {
             var trans = Transform.build(dirname)
             var output = P.dirname(replaceSrc(path, "build"));
+            console.log("\n");
             console.log(`[${timeString()}] File Change: [${path}]`);
             console.log(`[${timeString()}] Build Output: [${output}]`);
             if (P.extname(path) == ".jsx") {
@@ -218,10 +220,11 @@ module.exports = function(dirname, requireMap, persistList) {
                     .pipe(gulp.dest(output));
             } else if (P.extname(path) == ".js") {
                 var stm = gulp.src(path).pipe(trans.gulp()).pipe(gulp.dest(output));
-            } else { //less ..
+            } else { //less json
                 var stm = gulp.src(path).pipe(gulp.dest(output));
             }
             stm.on("finish", repack)
+            stm.on("finish", redist.bind(null, path))
         }
 
         function repack() {
@@ -234,6 +237,16 @@ module.exports = function(dirname, requireMap, persistList) {
                 .pipe(source("bundle.js"))
                 .pipe(buffer())
                 .pipe(gulp.dest(dest))
+        }
+
+        function redist(path) {
+            var trans = Transform.dist(dirname)
+            var input = replaceSrc(path, "build")
+            var output = P.dirname(replaceSrc(path, "dist"))
+            console.log("[Dist] Output => " + output)
+            return gulp.src(input)
+                .pipe(trans.gulp())
+                .pipe(gulp.dest(output));
         }
 
         b.bundle(startWatch)
