@@ -30,7 +30,7 @@ var defaultMap = {
     "bluebird": "//cdn.bootcss.com/bluebird/3.3.5/bluebird.js",
     "moment": "//cdn.bootcss.com/moment.js/2.13.0/moment.js",
 }
-var defaultList = ["yy-fe/ev", "events", "util"]
+var defaultList = ["yy-fe/ev", "yy-fe/element", "events", "util"]
 
 function errorHandler(err) {
     console.log(err.stack);

@@ -2,6 +2,7 @@ var React = require("react");
 var ReactDOM = require("react-dom");
 var _ = require("lodash");
 var ev = require("yy-fe/ev"); // 这里极其特殊，因为这个文件是通过复制分发出去的，路径不在这里
+var loading = require("yy-fe/element").loading;
 
 if (global.window) {
     $.ajaxSetup({ contentType: "application/json; charset=utf-8" });
@@ -52,6 +53,7 @@ function browserFetch(fn) {
         return [item.name, encodeURIComponent(item.url)].join("=");
     }).join("&");
     var url = "/fetch?" + search;
+    var node = loading();
     return $.ajax({
         url: url,
         type: "GET",
@@ -64,9 +66,11 @@ function browserFetch(fn) {
             _.toPairs(fetchData).map(function(pair) {
                 ev.env[pair[0]] = pair[1].data
             });
+            document.body.removeChild(node);
             fn(null, res);
         },
         error: function(err) {
+            document.body.removeChild(node);
             fn(err, null);
         },
     })
