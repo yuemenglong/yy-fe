@@ -100,7 +100,7 @@ function Transform(dirname) {
             var requirePath = getNodeValue(node);
             if (enablePath && requirePath[0] == "/") {
                 transformPath(dirname, file, node)
-            } else if (enableBase64 && /(\.png)|(\.gif)$/.test(requirePath)) {
+            } else if (enableBase64 && /(\.png)|(\.gif)|(\.jpg)$/.test(requirePath)) {
                 transformImg(file, node)
             } else if (match(clear, requirePath)) {
                 clearNode(node)
