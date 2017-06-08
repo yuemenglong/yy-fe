@@ -29,19 +29,21 @@ var defaultMap = {
     "lodash": "//cdn.bootcss.com/lodash.js/4.12.0/lodash.js",
     "bluebird": "//cdn.bootcss.com/bluebird/3.3.5/bluebird.js",
     "moment": "//cdn.bootcss.com/moment.js/2.13.0/moment.js",
+    "yy-fe/ev": null,
+    "yy-fe/element": null,
+    "events": null,
+    "util": null,
 }
-var defaultList = ["yy-fe/ev", "yy-fe/element", "events", "util"]
 
 function errorHandler(err) {
     console.log(err.stack);
 }
 
-module.exports = function(dirname, requireMap, persistList) {
+module.exports = function(dirname, requireMap, clearList) {
     if (arguments.length != 3) {
-        throw Error("Need [dirname, requireMap, persistList] Args")
+        throw Error("Need [dirname, requireMap, clearList] Args")
     }
     requireMap = _.merge({}, defaultMap, requireMap);
-    persistList = _.merge([], defaultList, persistList);
 
     function resolve(path) {
         return P.resolve(dirname, path);
@@ -125,7 +127,7 @@ module.exports = function(dirname, requireMap, persistList) {
             var src = P.resolve(dirname, "build", appName, "bundle.js")
             var dest = P.resolve(dirname, "bundle", appName)
             var b = browserify(src);
-            var trans = Transform.pack(dirname, requireMap, persistList, appName)
+            var trans = Transform.pack(dirname, requireMap, appName)
             b.transform(trans.browserify())
             return b.bundle(() => trans.output())
                 .pipe(source("bundle.js"))
@@ -185,7 +187,7 @@ module.exports = function(dirname, requireMap, persistList) {
         var src = P.resolve(dirname, "build", appName, "bundle.js")
         var dest = P.resolve(dirname, "bundle", appName)
         var b = browserify(src);
-        var trans = Transform.pack(dirname, requireMap, persistList, appName)
+        var trans = Transform.pack(dirname, requireMap, appName)
         b.transform(trans.browserify())
 
         function startWatch() {
@@ -231,7 +233,7 @@ module.exports = function(dirname, requireMap, persistList) {
             var src = P.resolve(dirname, "build", appName, "bundle.js")
             var dest = P.resolve(dirname, "bundle", appName)
             var b = browserify(src);
-            var trans = Transform.pack(dirname, requireMap, persistList, appName)
+            var trans = Transform.pack(dirname, requireMap, appName)
             b.transform(trans.browserify())
             return b.bundle(() => trans.output())
                 .pipe(source("bundle.js"))
@@ -261,101 +263,18 @@ module.exports = function(dirname, requireMap, persistList) {
                 .pipe(gulp.dest(output));
         }
 
-        b.bundle(startWatch)
-            .pipe(source("bundle.js"))
-            .pipe(buffer())
-            .pipe(gulp.dest(dest))
-
-    }
-
-    function timeString() {
-        var now = new Date();
-        return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
-    }
-
-    function watchSrc(done) {
-        var app = process.argv.slice(-1)[0].slice(2);
-        var srcWatcher = gulp.watch([
-            resolve("src/**/*.jsx"),
-            resolve("src/**/*.js"),
-            resolve("src/**/*.json"),
-        ]);
-        srcWatcher.on("change", function(path) {
-            var trans = Transform.build(dirname)
-            var output = P.dirname(replaceSrc(path, "build"));
-            console.log(`[${timeString()}] File Change: [${path}]`);
-            console.log(`[${timeString()}] Build Output: [${output}]`);
-            if (P.extname(path) == ".jsx") {
-                gulp.src(path)
-                    .pipe(jadeToJsx())
-                    .on("error", errorHandler)
-                    .pipe(babel({ presets: ["react"] }))
-                    .pipe(rename({ extname: ".js" }))
-                    // .pipe(build())
-                    .pipe(trans.gulp())
-                    .pipe(gulp.dest(output));
-            } else {
-                gulp.src(path).pipe(trans.gulp()).pipe(gulp.dest(output));
-            }
-        })
-        var lessWatcher = gulp.watch([resolve("src/**/*.less")]);
-        lessWatcher.on("change", function(path) {
-            var output = P.dirname(replaceSrc(path, "build"));
-            gulp.src(path).pipe(gulp.dest(output));
-        })
-        done();
-    }
-
-    function watchBuild(done) {
-        var app = process.argv.slice(-1)[0].slice(2);
-        var bundlePath = P.resolve(dirname, "build", app, "bundle.js");
-        var outputPath = P.resolve(dirname, "build", app, "bundle.js");
-        console.log(bundlePath)
-        var b = browserify(bundlePath, { cache: {}, packageCache: {} });
-        b.plugin(watchify);
-        b.on("update", bundle);
-        var trans = Transform.pack(dirname, requireMap, persistList, app)
-        b.transform(trans.browserify())
-            // var build = new Build.Browserify(b);
-            // build.plugin(new ExcludePlugin(requireMap));
-            // var lp = new LessPlugin("bundle.css");
-            // build.plugin(lp);
-        bundle(watchLess);
-
         function timeString() {
             var now = new Date();
             return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
         }
 
-        function watchLess() {
-            var watcher = gulp.watch(lp.getImports());
-            watcher.on("change", function(path) {
-                lp.rebuild(`${dirname}/bundle/${app}`);
-            })
-        }
-
-        function onFinish(err) {
-            if (err) {
-                console.log(`[${timeString()}] Build [${app}] Fail`);
-                console.log(err.stack);
-            } else {
-                console.log(`[${timeString()}] Build [${app}] Succ`);
-            }
-        }
-
-        function bundle(fn) {
-            console.log(`[${timeString()}] Build [${app}] Start`)
-            var cb = typeof fn == "function" ? fn : onFinish;
-            b.bundle(cb)
-                .pipe(source("bundle.js"))
-                .pipe(buffer())
-                .pipe(gulp.dest(`${dirname}/bundle/${app}`))
-        }
-        done();
+        b.bundle(startWatch)
+            .pipe(source("bundle.js"))
+            .pipe(buffer())
+            .pipe(gulp.dest(dest))
     }
 
     gulp.task('watch', gulp.series(watchValidate, all, watch));
-    // gulp.task('watch', gulp.series(watchValidate, build, disp, pack, dist, watchSrc, watchBuild));
 
     return gulp;
 }
