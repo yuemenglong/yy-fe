@@ -240,6 +240,18 @@ module.exports = function(dirname, requireMap, persistList) {
         }
 
         function redist(path) {
+            switch (P.extname(path)) {
+                case ".js":
+                case ".json":
+                    break;
+                case ".less":
+                    return;
+                case ".jsx":
+                    path = path.replace(/jsx$/, "js");
+                    break;
+                default:
+                    throw new Error("Unknown Ext: " + P.extname(path))
+            }
             var trans = Transform.dist(dirname)
             var input = replaceSrc(path, "build")
             var output = P.dirname(replaceSrc(path, "dist"))
