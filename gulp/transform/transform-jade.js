@@ -55,9 +55,9 @@ function TransformJade(requireMap, appName, outputPath) {
     this.output = function() {
         var lines = _.flatten(_.values(includes));
         var includeOutput = lines.map(function(l) {
-            if (_.endsWith(l, ".js")) {
+            if (_.endsWith(l, "js")) {
                 return util.format("%sscript(src='%s')", includeIndent, l)
-            } else if (_.endsWith(l, ".css")) {
+            } else if (_.endsWith(l, "css")) {
                 return util.format("%slink(rel='stylesheet' href='%s')", includeIndent, l);
             } else {
                 throw new Error("Unknown Include Type: " + l);
