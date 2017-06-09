@@ -230,12 +230,12 @@ Transform.pack = function(dirname, requireMap, appName) {
     return trans
 }
 
-Transform.dist = function(dirname) {
-    if (arguments.length != 1) {
-        throw Error("Pack Need [dirname] Args")
+Transform.dist = function(dirname, clearList) {
+    if (arguments.length != 2) {
+        throw Error("Pack Need [dirname, clearList] Args")
     }
     var trans = new Transform(dirname);
-    trans.clear([/\.less$/, /\.png$/]);
+    trans.clear(clearList);
     return trans;
 }
 

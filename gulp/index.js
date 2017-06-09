@@ -35,6 +35,8 @@ var defaultMap = {
     "util": null,
 }
 
+var defaultList = [/\.less$/];
+
 function errorHandler(err) {
     console.log(err.stack);
 }
@@ -44,6 +46,7 @@ module.exports = function(dirname, requireMap, clearList) {
         throw Error("Need [dirname, requireMap, clearList] Args")
     }
     requireMap = _.merge({}, defaultMap, requireMap);
+    clearList = _.concat([], defaultList, clearList);
 
     function resolve(path) {
         return P.resolve(dirname, path);
@@ -138,7 +141,7 @@ module.exports = function(dirname, requireMap, clearList) {
     }
 
     function dist() {
-        var trans = Transform.dist(dirname)
+        var trans = Transform.dist(dirname, clearList)
         return gulp.src(resolve("build/**/*.*"))
             .pipe(trans.gulp())
             .pipe(gulp.dest(`dist`));
@@ -254,7 +257,7 @@ module.exports = function(dirname, requireMap, clearList) {
                 default:
                     throw new Error("Unknown Ext: " + P.extname(path))
             }
-            var trans = Transform.dist(dirname)
+            var trans = Transform.dist(dirname, clearList)
             var input = replaceSrc(path, "build")
             var output = P.dirname(replaceSrc(path, "dist"))
             console.log("[Dist] Output => " + output)
