@@ -46,7 +46,10 @@ function createRoot() {
         }
     }
     ev.clearFetch = function(name) {
-        delete fetchData[name];
+        for(var i in arguments){
+            // delete fetchData[name];
+            delete fetchData[arguments[i]]
+        }
     }
 
     ev.getFetchData = function() {
