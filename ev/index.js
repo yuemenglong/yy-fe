@@ -7,7 +7,7 @@ function createRoot() {
     var window = global.window || {};
 
     ev.createFetch = function() {
-        return function(name, url) {
+        return function(name, url, fn) {
             if (typeof this.setState !== "function") {
                 throw Error("Fetch Function Must Bind To React Element");
             }
@@ -18,6 +18,7 @@ function createRoot() {
                 state[name] = res;
                 ev.env[name] = res;
                 that.setState(state);
+                fn && fn(res);
             }
             if (!fetchData[name]) {
                 fetchData[name] = {
