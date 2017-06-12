@@ -32,7 +32,7 @@ function createApp(App) {
 function fetchLoop() {
     browserFetch(function(err, res) {
         if (err) {
-            window.alert("加载错误");
+            window.alert(err.message || "页面出错，请按F5刷新后重试");
         } else if (res) {
             fetchLoop();
         } else {

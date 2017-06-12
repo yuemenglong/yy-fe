@@ -10,6 +10,7 @@ function getMessage(status) {
     return `后台服务出错(${status})，请按F5刷新后重试`;
 }
 
+// 转为标准err对象
 function error(body, status) {
     try {
         var json = JSON.parse(body)
