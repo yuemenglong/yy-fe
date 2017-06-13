@@ -1,4 +1,5 @@
 var Transmit = require("../util").Transmit;
+var errorObject = require("../util").errorObject;
 var _ = require("lodash");
 var Promise = require("bluebird");
 
@@ -10,7 +11,7 @@ module.exports = function(host, port) {
         var fetchFn = createFetch(host, port);
         fetchFn(request.query, request, response, function(err, res) {
             if (err) {
-                response.status(500).json(err);
+                response.status(500).json(errorObject(err));
             } else {
                 response.json(res);
             }

@@ -12,6 +12,8 @@ var errorMiddleware = fe.middleware.error;
 var fetchMiddleware = fe.middleware.fetch;
 var serverRenderMiddleware = fe.middleware.serverRender;
 
+var Transmit = fe.util.Transmit;
+
 var fetch = fetchMiddleware("localhost", 8080);
 var render = serverRenderMiddleware(__dirname, "localhost", 8080);
 
@@ -63,6 +65,9 @@ be.get("/fetch-data2", function(req, res) {
 })
 be.get("/fetch-data3", function(req, res) {
     res.json({ status: "succ3" });
+})
+be.get("/error", function(req, res) {
+    res.status(500).json({ name: "TEST_ERROR", message: "测试错误处理" });
 })
 be.listen(8080, function(err) {
     if (err) {

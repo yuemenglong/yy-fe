@@ -26,6 +26,9 @@ function error(body, status) {
 }
 
 function Transmit(host, port, fn, opt) {
+    if (arguments.length < 2) {
+        throw new Error("New Transmit Need Args[host, port, <fn, opt>]")
+    }
     opt = opt || {}
     var transmit = function(req, res) {
         function errorHandler(err) {

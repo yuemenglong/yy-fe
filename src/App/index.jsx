@@ -10,14 +10,19 @@ var Link = ReactRouter.Link;
 require("./style.less");
 
 function AppClass() {
+    this.fetch = ev.createFetch();
     this.getInitialState = function() {
         return {};
+    }
+    this.onClickError = function(){
+        this.fetch("error", "/error");
     }
     this.render = function() {
         return jade(`
         div
             Link(to="/") Index
             Link(to="/about") About
+            a(href="javascript:void(0);" onClick={this.onClickError}) checkError
             |{this.props.children}`);
     };
 }

@@ -69,9 +69,9 @@ function browserFetch(fn) {
             document.body.removeChild(node);
             fn(null, res);
         },
-        error: function(err) {
+        error: function(res) {
             document.body.removeChild(node);
-            fn(err, null);
+            fn(res.responseJSON || {}, null);
         },
     })
 }
