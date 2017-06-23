@@ -23,12 +23,12 @@ html
         script(src="//cdn.bootcss.com/es5-shim/4.5.9/es5-sham.js")
         script(src="//cdn.bootcss.com/jquery/1.12.4/jquery.js")
         @{INCLUDE}
-        link(rel="stylesheet" href="/bundle/@{APP}/bundle.css")
+        link(rel="stylesheet" href="/bundle/@{APP}/bundle.css@{TAG}")
         script.
             window.__INITIAL_STATE__ = (function(){return !{JSON.stringify(init)}})();
     body
         #container !{html}
-        script(src="/bundle/@{APP}/bundle.js")`
+        script(src="/bundle/@{APP}/bundle.js@{TAG}")`
 var includeMatch = tpl.match(/^(.*)\@{INCLUDE}.*$/m);
 var includeAnchor = includeMatch[0];
 var includeIndent = includeMatch[1];
@@ -66,6 +66,7 @@ function TransformJade(requireMap, appName, outputPath) {
         }).join("\n");
         var content = tpl
             .replace(/\@{APP}/g, appName)
+            .replace(/\@{TAG}/g, `?t=${new Date().valueOf()}`)
             .replace(includeAnchor, includeOutput)
         fs.mkdirSync(P.dirname(outputPath))
         fs.writeFileSync(outputPath, content)
