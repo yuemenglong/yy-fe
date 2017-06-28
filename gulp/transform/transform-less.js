@@ -11,6 +11,32 @@ var stream = require("stream");
 var getNodeValue = require("./common").getNodeValue;
 var clearNode = require("./common").clearNode;
 
+function transDataUri(filePath, lessPath) {
+    var content = fs.readFileSync(lessPath).toString()
+    var reg = /data-uri\((['"])(.+)\1\)/g
+    var re = /data-uri\((['"])(.+)\1\)/
+
+    if (!content.match(reg)) {
+        return;
+    }
+    content = content.replace(reg, function(str) {
+        var relPath = str.match(re)[2]
+        if (!relPath.startsWith(".")) {
+            return str;
+        }
+        var absPath = P.resolve(P.dirname(filePath), relPath)
+        if (!fs.existsSync(absPath)) {
+            console.error(new Error("Data-Uri Not Exists: " + absPath).stack)
+            return str;
+        }
+        absPath = absPath.replace(/\\/g, "/")
+        console.log(`[Less] data-uri: ${absPath}`)
+        str = str.replace(relPath, absPath)
+        return str
+    })
+    fs.writeFileSync(lessPath, content)
+}
+
 function TransformLess(outputPath) {
     if (arguments.length != 1) {
         throw Error("Need [outputPath] Args")
@@ -19,6 +45,7 @@ function TransformLess(outputPath) {
     this.transform = function(file, node) {
         var path = getNodeValue(node);
         var abs = P.resolve(P.dirname(file), path);
+        transDataUri(file, abs);
         var line = `@import '${abs.replace("\\", "\\\\")}';`;
         console.log(`[Less]: ${line}`);
         // that.push(line + "\n");

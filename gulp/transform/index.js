@@ -105,7 +105,7 @@ function Transform(dirname) {
             } else if (match(clear, requirePath)) {
                 clearNode(node)
             } else if (match(persist, requirePath)) {
-                // nothing
+                // nothing, 要保留的文件，什么都不做
             } else if (transformLess && /\.less$/.test(requirePath)) {
                 transformLess.transform(file, node)
             } else if (transformJade && requirePath[0] != ".") {
@@ -157,7 +157,8 @@ function Transform(dirname) {
         // 保留
         persist = _.concat(persist, list)
     }
-    var ignore = [/.*\.json$/, /.*\.less$/];
+    // var ignore = [/.*\.json$/, /.*\.less$/, /.*\.jpg$/, /.*\.png$/, /.*\.gif$/];
+    var ignore = [];
     this.ignore = function(list) {
         // 不处理,比如json, less
         ignore = _.concat(ignore, list)
@@ -194,9 +195,9 @@ function Transform(dirname) {
     }
 }
 
-Transform.build = function(dirname) {
-    if (arguments.length != 1) {
-        throw Error("Pack Need [dirname] Args")
+Transform.build = function(dirname, ignoreList) {
+    if (arguments.length != 2) {
+        throw Error("Pack Need [dirname, ignoreList] Args")
     }
     var trans = new Transform(dirname);
     // 路径展开
@@ -205,6 +206,8 @@ Transform.build = function(dirname) {
     trans.enableBase64();
     // 保留所有
     trans.persist(/.*/);
+    // 忽略所选
+    trans.ignore(ignoreList);
     return trans;
 }
 
@@ -230,12 +233,13 @@ Transform.pack = function(dirname, requireMap, appName) {
     return trans
 }
 
-Transform.dist = function(dirname, clearList) {
-    if (arguments.length != 2) {
-        throw Error("Pack Need [dirname, clearList] Args")
+Transform.dist = function(dirname, clearList, ignoreList) {
+    if (arguments.length != 3) {
+        throw Error("Pack Need [dirname, clearList, ignoreList] Args")
     }
     var trans = new Transform(dirname);
     trans.clear(clearList);
+    trans.ignore(ignoreList);
     return trans;
 }
 
