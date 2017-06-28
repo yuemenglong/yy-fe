@@ -5,7 +5,7 @@ require("./style.less");
 function Test() {
     this.render = function() {
         return jade(`
-        div(className="test" onMouse)
+        div(className="test")
             `);
     }
 }
