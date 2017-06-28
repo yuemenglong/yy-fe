@@ -21,7 +21,8 @@ var merge = require('merge-stream');
 
 var Transform = require("./transform")
 
-var defaultMap = {
+// 默认的映射文件
+var defaultRequireMap = {
     "bootstrap": "//cdn.bootcss.com/bootstrap/3.3.6/css/bootstrap.css",
     "react": "//cdn.bootcss.com/react/0.14.9/react.js",
     "react-dom": "//cdn.bootcss.com/react/0.14.9/react-dom.js",
@@ -35,18 +36,20 @@ var defaultMap = {
     "util": null,
 }
 
-var defaultList = [/\.less$/];
+var defaultClearList = [/\.less$/]; // 需要将require删掉的文件
+var defaultIgnoreList = [/\.json$/, /\.less$/, /\.jpg$/, /\.png$/, /\.gif$/]; // 无需处理的文件
 
 function errorHandler(err) {
     console.log(err.stack);
 }
 
-module.exports = function(dirname, requireMap, clearList) {
-    if (arguments.length != 3) {
-        throw Error("Need [dirname, requireMap, clearList] Args")
+module.exports = function(dirname, requireMap, clearList, ignoreList) {
+    if (arguments.length != 4) {
+        throw Error("Need [dirname, requireMap, clearList, ignoreList] Args")
     }
-    requireMap = _.merge({}, defaultMap, requireMap);
-    clearList = _.concat([], defaultList, clearList);
+    requireMap = _.merge({}, defaultRequireMap, requireMap);
+    clearList = _.concat([], defaultClearList, clearList);
+    ignoreList = _.concat([], defaultIgnoreList, ignoreList);
 
     function resolve(path) {
         return P.resolve(dirname, path);
@@ -101,7 +104,7 @@ module.exports = function(dirname, requireMap, clearList) {
     var apps = getApps();
 
     function build() {
-        var trans = Transform.build(dirname)
+        var trans = Transform.build(dirname, ignoreList)
         var buildTask = gulp.src(resolve("src/**/*.jsx"))
             .pipe(jadeToJsx())
             .on("error", errorHandler)
@@ -109,7 +112,7 @@ module.exports = function(dirname, requireMap, clearList) {
             .pipe(babel({ presets: ['react'] }))
             .pipe(rename({ extname: ".js" }))
             .pipe(trans.gulp())
-            .pipe(addsrc([resolve("src/**/*.less"), resolve("src/**/*.json")]))
+            .pipe(addsrc([resolve("src/**/*.*")]))
             .pipe(gulp.dest(resolve("build")));
         return buildTask;
     }
@@ -141,7 +144,7 @@ module.exports = function(dirname, requireMap, clearList) {
     }
 
     function dist() {
-        var trans = Transform.dist(dirname, clearList)
+        var trans = Transform.dist(dirname, clearList, ignoreList)
         return gulp.src(resolve("build/**/*.*"))
             .pipe(trans.gulp())
             .pipe(gulp.dest(`dist`));
@@ -210,7 +213,7 @@ module.exports = function(dirname, requireMap, clearList) {
         }
 
         function onSrcChange(path) {
-            var trans = Transform.build(dirname)
+            var trans = Transform.build(dirname, ignoreList)
             var output = P.dirname(replaceSrc(path, "build"));
             console.log("\n");
             console.log(`[${timeString()}] File Change: [${path}]`);
@@ -257,7 +260,7 @@ module.exports = function(dirname, requireMap, clearList) {
                 default:
                     throw new Error("Unknown Ext: " + P.extname(path))
             }
-            var trans = Transform.dist(dirname, clearList)
+            var trans = Transform.dist(dirname, clearList, ignoreList)
             var input = replaceSrc(path, "build")
             var output = P.dirname(replaceSrc(path, "dist"))
             console.log("[Dist] Output => " + output)

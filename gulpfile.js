@@ -1,3 +1,3 @@
 var fe = require(".");
 
-fe.gulp(__dirname, {}, []);
+fe.gulp(__dirname, {}, [], []);
