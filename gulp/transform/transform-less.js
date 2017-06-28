@@ -10,6 +10,7 @@ var through = require("through2");
 var stream = require("stream");
 var getNodeValue = require("./common").getNodeValue;
 var clearNode = require("./common").clearNode;
+var dataBase64 = require("./transform-img").dataBase64;
 
 function transDataUri(filePath, lessPath) {
     var content = fs.readFileSync(lessPath).toString()
@@ -29,10 +30,12 @@ function transDataUri(filePath, lessPath) {
             console.error(new Error("Data-Uri Not Exists: " + absPath).stack)
             return str;
         }
-        absPath = absPath.replace(/\\/g, "/")
         console.log(`[Less] data-uri: ${absPath}`)
-        str = str.replace(relPath, absPath)
-        return str
+        // absPath = absPath.replace(/\\/g, "/")
+        var base64 = dataBase64(absPath)
+        return `url(${base64})`
+        // str = str.replace(relPath, absPath)
+        // return str
     })
     fs.writeFileSync(lessPath, content)
 }
