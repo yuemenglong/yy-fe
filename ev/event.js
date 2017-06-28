@@ -22,17 +22,23 @@ function EventEmitterEx(parent) {
 
 ! function(ctor, superCtor) {
     ctor.super_ = superCtor;
-    ctor.prototype = Object.create(superCtor.prototype, {
-        constructor: {
-            value: ctor,
-            enumerable: false,
-            writable: true,
-            configurable: true
-        }
-    });
+    ctor.prototype = function(proto) {
+        function F() {}
+        F.prototype = proto;
+        return new F();
+    }(superCtor.prototype)
+
+    // ctor.prototype = Object.create(superCtor.prototype, {
+    //     constructor: {
+    //         value: ctor,
+    //         enumerable: false,
+    //         writable: true,
+    //         configurable: true
+    //     }
+    // });
 }(EventEmitterEx, EventEmitter);
 
-EventEmitterEx.prototype.EVENT_TYPE = EVENT_TYPE;
+// EventEmitterEx.prototype.EVENT_TYPE = EVENT_TYPE;
 
 EventEmitterEx.prototype.fork = function(cb) {
     var ret = new EventEmitterEx(this);
