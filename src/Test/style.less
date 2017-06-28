@@ -20,8 +20,9 @@ body {
 }
 
 @_PAGE_WIDTH: 1003px;
-@top-bar-height: 37px;
+@_TOP_BAR_HEIGHT: 37px;
 #top {
+    background-image: data-uri("D:/workspace/nodejs/cchtrip/node_modules/yy-fe/src/Test/img/main_01.jpg");
     #top-bar {
         background-color: #eeeff1;
         #top-bar-in {
@@ -30,7 +31,7 @@ body {
             font-size: 12px;
             .sub() {
                 display: inline-block;
-                height: @top-bar-height;
+                height: @_TOP_BAR_HEIGHT;
             }
             .left {
                 width: 75%;
@@ -86,13 +87,4 @@ body {
 #body {
     width: @_PAGE_WIDTH;
     margin: auto;
-    #header-line {
-        border-top: #c00 solid 2px;
-        height: 1px;
-    }
-    #header-popup {
-        border: #c00 solid 2px;
-        height: 317px;
-    }
 }
-

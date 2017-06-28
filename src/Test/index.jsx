@@ -1,18 +1,14 @@
 var React = require("react");
 var ev = require("yy-fe/ev");
 require("./style.less");
-var BG = require("./img/main_01.jpg");
+var NavPopup = require("./component/NavPopup")
 
 function FirstClass() {
     this.getInitialState = function() {
         return { navHover: null }
     }
     this.renderHeaderPopup = function() {
-        if (this.state.navHover == null) {
-            return jade(`div(id="header-line")`)
-        } else {
-            return jade(`div(id="header-popup" onMouseOut={this.onNavMouseOut})`)
-        }
+        return jade(`NavPopup(navHover={this.state.navHover})`)
     }
     this.onNavMouseOver = function(i) {
         this.setState({ navHover: i })
@@ -32,10 +28,9 @@ function FirstClass() {
         }.bind(this)))
     }
     this.render = function() {
-        var bg = { background: `url("${BG}")` }
         return jade(`
         div
-            div(id="top" style={bg})
+            div(id="top") 
                 div(id="top-bar")
                     div(id="top-bar-in")
                         div(className="left")
