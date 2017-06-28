@@ -37,6 +37,11 @@ app.get("/test", function(req, res) {
     res.render("Test", { title: "yy-fe-测试" });
 })
 
+app.get("/site", function(req, res) {
+    res.render("Site", { title: "yy-fe-测试" });
+})
+
+
 app.get("/*", render(function(req, res) {
     res.render("App");
 }, true))

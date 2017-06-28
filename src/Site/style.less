@@ -1,0 +1,74 @@
+.proto {
+    border-style: solid;
+    border-color: #888;
+    border-width: 1px;
+}
+
+body {
+    font-family: Microsoft Yahei;
+    margin: 0px;
+}
+
+.vertical-middle {
+    &:after {
+        content: "";
+        display: inline-block;
+        vertical-align: middle;
+        width: 0;
+        height: 100%;
+    }
+}
+
+@_PAGE_WIDTH: 1003px;
+@_TOP_BAR_HEIGHT: 37px;
+#top {
+    background-image: data-uri("D:/workspace/nodejs/cchtrip/node_modules/yy-fe/src/Site/img/main_01.jpg");
+    #top-bar {
+        background-color: #eeeff1;
+        #top-bar-in {
+            margin: auto;
+            width: @_PAGE_WIDTH;
+            font-size: 12px;
+            .sub() {
+                display: inline-block;
+                height: @_TOP_BAR_HEIGHT;
+                .vertical-middle;
+            }
+            .left {
+                width: 75%;
+                .sub();
+                div {
+                    padding-left: 10px;
+                    vertical-align: middle;
+                    display: inline-block;
+                    width: 110px;
+                    .vertical-middle;
+                }
+            }
+            .right {
+                .sub();
+                span {
+                    .vertical-middle;
+                    border-right: solid;
+                    border-color: #888;
+                    border-width: 1px;
+                    padding: 0px 5px;
+                }
+            }
+        }
+    }
+    .header {
+        height: 190px;
+        width: @_PAGE_WIDTH;
+        margin: auto;
+        position: relative;
+        .header-banner{
+            height: 150px;
+        }
+    }
+}
+
+.body {
+    width: @_PAGE_WIDTH;
+    margin: auto;
+}

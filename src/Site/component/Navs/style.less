@@ -1,0 +1,74 @@
+.header-nav {
+    span {
+        font-size: 16px;
+        font-weight: bold;
+        color: #367fc0;
+        background-image: data-uri('D:/workspace/nodejs/cchtrip/node_modules/yy-fe/src/Site/img/nav1.png');
+        display: inline-block;
+        margin: 0px 12px;
+        padding: 10px 0px 9px 49px;
+        cursor: pointer;
+        width: 70px;
+        height: 21px;
+        &:hover {
+            color: #fff;
+            background-position: 0px 40px;
+        }
+    }
+    .header-popup-container {
+        position: relative;
+    }
+    #header-line {
+        border-top: #c00 solid 2px;
+        height: 1px;
+    }
+    #header-popup {
+        position: absolute;
+        top: 0;
+        left: 0;
+        border: #c00 solid 2px;
+        height: 317px;
+        li {
+            font-size: 14px;
+            display: inline-block;
+            margin: 0px 10px 9px 4px;
+            padding: 0 0 0 10;
+            &.full {
+                width: 400px;
+            }
+            &.part {
+                width: 200px;
+            }
+            background: url("http://www.hncd.gov.cn/portal/lib/jttnew/images/dian.jpg") no-repeat left;
+        }
+        .left {
+            display: inline-block;
+            width: 50%;
+            height: 100%;
+            vertical-align: top;
+            .popup-detail {}
+        }
+        .right {
+            vertical-align: top;
+            display: inline-block;
+            width: 49%;
+            height: 100%;
+            .column {
+                display: inline-block;
+                height: 100%;
+                width: 120px;
+                li {
+                    margin-right: 0px;
+                    width: %100;
+                }
+            }
+        }
+        .popup-header {
+            font-size: 16px;
+            color: #c00;
+            margin: 0 27px 0 30px;
+            padding: 21px 0px 10px 8px;
+            border-bottom: solid 1px #888;
+        }
+    }
+}
