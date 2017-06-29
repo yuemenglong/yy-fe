@@ -42,6 +42,18 @@ function SiteClass() {
         })
         return jade(`NavTab(className="right" header={[header, header]} body={[body, body]})`)
     }
+    this.renderImgLinks = function() {
+        return _.times(5).map(function(o, i) {
+            return jade(`img(key={i} src="http://www.hncd.gov.cn/portal/rootimages/2015/01/09/1420765832581498.jpg")`)
+        })
+    }
+    this.renderBSFW = function() {
+        var header = "办事服务";
+        var body = _.times(4).map(function(o, i) {
+            return jade(`li(key={i}) 办事指南`)
+        })
+        return jade(`NavTab(className="left" header={[header,header]} body={[body,body]})`)
+    }
     this.render = function() {
         return jade(`
         div
@@ -72,6 +84,10 @@ function SiteClass() {
                 div(className="row2")
                     |{this.renderTZGG()}
                     |{this.renderWSCYZ()}
+                div(className="row3")
+                    |{this.renderImgLinks()}
+                div(className="row4")
+                    |{this.renderBSFW()}
             `);
     }
 }
