@@ -1,15 +1,21 @@
-.proto {
-    border-style: solid;
-    border-color: #888;
-    border-width: 1px;
-}
-
 body {
     font-family: Microsoft Yahei;
     margin: 0px;
 }
 
+ul {
+    margin: 0;
+    padding: 0;
+    li {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+}
+
 .vertical-middle {
+    display: inline-block;
+    vertical-align: middle;
     &:after {
         content: "";
         display: inline-block;
@@ -19,8 +25,16 @@ body {
     }
 }
 
+.dot-overflow {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    -moz-binding: url('ellipsis.xml#ellipsis');
+    overflow: hidden;
+}
+
 @_PAGE_WIDTH: 1003px;
-@_TOP_BAR_HEIGHT: 37px;
+@_COLUMN_MARGIN: 10px;
 #top {
     background-image: data-uri("./img/main_01.jpg");
     #top-bar {
@@ -31,7 +45,7 @@ body {
             font-size: 12px;
             .sub() {
                 display: inline-block;
-                height: @_TOP_BAR_HEIGHT;
+                height: 37px;
                 .vertical-middle;
             }
             .left {
@@ -59,21 +73,169 @@ body {
     }
     .header {
         height: 190px;
-        width: @_PAGE_WIDTH;
+        width: 1241px;
         margin: auto;
         position: relative;
-        .header-banner{
-            width: 1241px;
+        background-image: url("http://www.hncd.gov.cn/portal/lib/jttnew/images/banner.png");
+        .header-banner {
             margin: auto;
-            // background-image: data-uri("./component/Navs/img/nav1.png");
-            background-image: data-uri("./img/banner.png");
-            // background-image: data-uri("./img/main_01.jpg");
             height: 150px;
         }
     }
 }
 
-.body {
+#body {
     width: @_PAGE_WIDTH;
     margin: auto;
+    @WIDTH: 490px;
+    >.row1 {
+        margin-top: 4px;
+        height: 312px;
+        >.left {
+            display: inline-block;
+            vertical-align: top;
+            width: @WIDTH;
+            height: 100%;
+            background-color: #f7f7f7;
+            margin-right: @_COLUMN_MARGIN;
+        }
+        >.right {
+            display: inline-block;
+            vertical-align: top;
+            width: @WIDTH;
+            height: 100%;
+            border: solid 1px #ccc;
+            background-color: #f4f4f4;
+            >.header {
+                height: 30px;
+                border-bottom: solid 1px #ccc;
+                margin: 0 13;
+                padding: 3 0;
+                >.left {
+                    font-size: 18px;
+                    color: #c00;
+                    display: inline-block;
+                    margin-right: 322px;
+                    .vertical-middle;
+                    li {
+                        font-size: 16px;
+                    }
+                }
+                >.right {
+                    font-size: 12px;
+                    width: 70px;
+                    .vertical-middle;
+                }
+            }
+            >ul.list {
+                padding: 0;
+                margin: 0;
+                >li {
+                    list-style: none;
+                    border-bottom: 1px #ccc solid;
+                    margin: 0 13;
+                    padding: 6 0;
+                    font-size: 14px;
+                    color: #333;
+                    >.left {
+                        display: inline-block;
+                        vertical-align: top;
+                        width: 305px;
+                        margin-right: 72px;
+                        .dot-overflow;
+                    }
+                    >.right {
+                        display: inline-block;
+                        vertical-align: top;
+                        width: 80px;
+                        text-align: right;
+                    }
+                }
+            }
+        }
+    }
+    >.row2 {
+        margin-top: 10;
+        .header() {
+            background-color: #f4f4f4;
+            font-size: 16px;
+            >li {
+                border-right: 1px solid #ccc;
+                padding: 8px 19px;
+                &:nth-last-child(1) {
+                    border-right: none;
+                    &.active {
+                        border-right: 1px solid #ccc;
+                    }
+                }
+                &.active {
+                    background-color: #fff;
+                    border-top: 2px solid #009;
+                    border-bottom: 1px solid #fff;
+                }
+            }
+        }
+        .body() {
+            height: 196px;
+            margin-top: -1px;
+            border-top: 1px solid #ccc;
+            font-size: 14px;
+        }
+        .child() {
+            display: inline-block;
+            vertical-align: top;
+            border: solid 1px #ccc;
+            width: @WIDTH;
+        }
+        //通知公告
+        >.left {
+            .child();
+            margin-right: @_COLUMN_MARGIN;
+            >ul.header {
+                .header();
+            }
+            >.body {
+                .body();
+                >ul {
+                    margin: 0;
+                    padding: 0 10px;
+                    >li {
+                        margin: 10 0;
+                        padding: 0 0;
+                        list-style: none;
+                        >.left {
+                            display: inline-block;
+                            vertical-align: bottom;
+                            .dot-overflow;
+                            width: 360;
+                            margin-right: 20px;
+                        }
+                        >.right {
+                            display: inline-block;
+                            vertical-align: bottom;
+                            width: 80;
+                        }
+                    }
+                }
+            }
+        }
+        // 我是从业者
+        >.right {
+            .child();
+            .header {
+                .header();
+            }
+            .body {
+                .body();
+                >ul {
+                    >li {
+                        display: inline-block;
+                        vertical-align: top;
+                        width: 84px;
+                        margin: 0 39px;
+                    }
+                }
+            }
+        }
+    }
 }
