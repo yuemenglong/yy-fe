@@ -33,8 +33,14 @@ ul {
     overflow: hidden;
 }
 
+.column {
+    display: inline-block;
+    vertical-align: top;
+}
+
 @_PAGE_WIDTH: 1003px;
 @_COLUMN_MARGIN: 10px;
+@_COLUMN_WIDTH: 490px;
 #top {
     background-image: data-uri("./img/main_01.jpg");
     #top-bar {
@@ -87,7 +93,6 @@ ul {
 #body {
     width: @_PAGE_WIDTH;
     margin: auto;
-    @_COLUMN_WIDTH: 490px;
     .header() {
         background-color: #f4f4f4;
         font-size: 16px;
@@ -339,10 +344,53 @@ ul {
                     float: left;
                     margin: 10 10;
                 }
-                >p{
+                >p {
                     margin-right: 10px;
                 }
                 overflow: hidden;
+            }
+        }
+    }
+}
+
+#footer {
+    margin-top: 10px;
+    background-color: #3f9be0;
+    .inner {
+        width: @_PAGE_WIDTH;
+        margin: auto;
+        >.row1 {
+            >select {
+                margin: 16px 20px 0 0;
+                padding: 0 0 0 0;
+                &:nth-last-child(1) {
+                    margin-right: 0;
+                }
+            }
+        }
+        >.row2 {
+            display: inline-block;
+            vertical-align: top;
+            margin-top: 10px;
+            font-size: 14px;
+            color: white;
+            >* {
+                display: inline-block;
+                vertical-align: top;
+            }
+            >img {
+                margin: 0 0 0 120;
+                padding: 0 0 0 0;
+            }
+            >ul{
+                margin: 9 0 0 0;
+                padding: 0 0 0 0;
+                >li {
+                    margin: 7 0 0 0;
+                }
+            }
+            >ul:nth-child(3) {
+                margin-left: 205px;
             }
         }
     }

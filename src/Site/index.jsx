@@ -80,6 +80,15 @@ function SiteClass() {
         ]
         return jade(`NavTab(className="right" header={[header, header]} body={[body,body]})`)
     }
+    this.renderSelects = function() {
+        return _.times(5).map(function(item, i) {
+            return jade(`select(key={i})`, function() {
+                return ["+---------厅直属单位----------+"].map(function(v, i) {
+                    return jade(`option(value={i} key={i}) {v}`)
+                })
+            })
+        });
+    }
     this.render = function() {
         return jade(`
         div
@@ -115,7 +124,19 @@ function SiteClass() {
                 div(className="row4")
                     |{this.renderBSFW()}
                     |{this.renderZXFT()}
-                    
+            div(id="footer")
+                div(className="inner")
+                    div(className="row1")
+                        |{this.renderSelects()}
+                    div(className="row2")
+                        img(src="http://dcs.conac.cn/image/red.png")
+                        ul
+                            li 网站纠错
+                            li 网站地图
+                        ul
+                            li 主办：河南省交通运输厅 制作维护：河南省交通通信中心
+                            li 豫ICP备：12020435号 郑公备：41010029000286
+
             `);
     }
 }
