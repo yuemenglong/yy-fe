@@ -108,11 +108,11 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
         var buildTask = gulp.src(resolve("src/**/*.jsx"))
             .pipe(jadeToJsx())
             .on("error", errorHandler)
-            .pipe(addsrc([resolve("src/**/*.js")]))
+            // .pipe(addsrc([resolve("src/**/*.js")]))
             .pipe(babel({ presets: ['react'] }))
             .pipe(rename({ extname: ".js" }))
+            .pipe(addsrc([resolve("src/**/*.*"), "!" + resolve("src/**/*.jsx")]))
             .pipe(trans.gulp())
-            .pipe(addsrc([resolve("src/**/*.*")]))
             .pipe(gulp.dest(resolve("build")));
         return buildTask;
     }
@@ -133,7 +133,7 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
             var src = P.resolve(dirname, "build", appName, "bundle.js")
             var dest = P.resolve(dirname, "bundle", appName)
             var b = browserify(src);
-            var trans = Transform.pack(dirname, requireMap, appName)
+            var trans = Transform.pack(dirname, appName, requireMap, ignoreList)
             b.transform(trans.browserify())
             return b.bundle(() => trans.output())
                 .pipe(source("bundle.js"))
@@ -193,7 +193,7 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
         var src = P.resolve(dirname, "build", appName, "bundle.js")
         var dest = P.resolve(dirname, "bundle", appName)
         var b = browserify(src);
-        var trans = Transform.pack(dirname, requireMap, appName)
+        var trans = Transform.pack(dirname, appName, requireMap, ignoreList)
         b.transform(trans.browserify())
 
         function startWatch() {
@@ -239,7 +239,7 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
             var src = P.resolve(dirname, "build", appName, "bundle.js")
             var dest = P.resolve(dirname, "bundle", appName)
             var b = browserify(src);
-            var trans = Transform.pack(dirname, requireMap, appName)
+            var trans = Transform.pack(dirname, appName, requireMap, ignoreList)
             b.transform(trans.browserify())
             return b.bundle(() => trans.output())
                 .pipe(source("bundle.js"))

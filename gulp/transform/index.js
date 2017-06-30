@@ -211,9 +211,9 @@ Transform.build = function(dirname, ignoreList) {
     return trans;
 }
 
-Transform.pack = function(dirname, requireMap, appName) {
-    if (arguments.length != 3) {
-        throw Error("Pack Need [dirname, requireMap, appName] Args")
+Transform.pack = function(dirname, appName, requireMap, ignoreList) {
+    if (arguments.length != 4) {
+        throw Error("dirname, appName, requireMap, ignoreList] Args")
     }
     var trans = new Transform(dirname);
     var persistList = _(requireMap).toPairs().filter(function(pair) {
@@ -225,6 +225,7 @@ Transform.pack = function(dirname, requireMap, appName) {
         return pair[1] != null
     }).fromPairs().value();
     trans.persist(persistList);
+    trans.ignore(ignoreList);
     // jade and less
     var jadePath = P.resolve(dirname, "jade", appName + ".jade")
     var lessPath = P.resolve(dirname, "bundle", appName, "bundle.css")
