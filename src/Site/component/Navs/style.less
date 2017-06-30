@@ -1,7 +1,7 @@
 .header-nav {
     width: 1003px;
     margin: auto;
-    span {
+    >span {
         font-size: 16px;
         font-weight: bold;
         color: #367fc0;
@@ -49,17 +49,20 @@
             width: 50%;
             height: 100%;
             vertical-align: top;
-            .popup-detail {}
+            >ul.popup-detail {
+                padding: 10px 0 0 30px;
+            }
         }
         .right {
             vertical-align: top;
             display: inline-block;
             width: 49%;
             height: 100%;
-            .column {
+            ul.column {
                 display: inline-block;
                 height: 100%;
                 width: 120px;
+                margin: 11px 0px 0 36px;
                 li {
                     margin-right: 0px;
                     width: %100;
