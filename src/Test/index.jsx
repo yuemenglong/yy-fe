@@ -1,16 +1,19 @@
 var React = require("react");
 var ev = require("yy-fe/ev");
 require("./style.less");
+var PIC = require("./small.png")
 
 function Test() {
     this.render = function() {
+        var props = {
+            style: {
+                backgroundImage: "url('" + PIC + "')",
+            }
+        }
         return jade(`
-        div(className="test")
-            ul
-                li 1
-                li 2
-            div(className="r1") hello
-            div(className="r2") world
+        div
+            div(className="test" {...props})
+            div(className="test2")
             `);
     }
 }

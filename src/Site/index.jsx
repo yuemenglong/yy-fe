@@ -75,8 +75,8 @@ function SiteClass() {
         var header = "在线访谈";
         var body = [
             jade(`img(key="img" src="http://www.hncd.gov.cn/portal/rootimages/2017/05/27/1495848788161956.jpg")`),
-            jade(`p 主题： 厅总规划师张宏做客河南政府网“在线访谈”栏目，介绍我省交通运输发展情况`),
-            jade(`p 主题： 厅总规划师张宏做客河南政府网“在线访谈”栏目，介绍我省交通运输发展情况`),
+            jade(`p(key="p1") 主题： 厅总规划师张宏做客河南政府网“在线访谈”栏目，介绍我省交通运输发展情况`),
+            jade(`p(key="p2") 主题： 厅总规划师张宏做客河南政府网“在线访谈”栏目，介绍我省交通运输发展情况`),
         ]
         return jade(`NavTab(className="right" header={[header, header]} body={[body,body]})`)
     }
