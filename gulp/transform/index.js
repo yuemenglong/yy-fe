@@ -11,10 +11,7 @@ var transformPath = require("./transform-path");
 var transformImg = require("./transform-img");
 var TransformJade = require("./transform-jade");
 var TransformLess = require("./transform-less");
-
-var requirePattern = /^.*require\((['"]).+\1\).*$/gm;
-var pathPattern = /.*require\((['"])(.+)\1\).*/;
-var useStrictPattern = /^(['"])use strict\1.*/g
+var replaceLess = require("./replace-less");
 
 var getNodeValue = require("./common").getNodeValue
 var setNodeValue = require("./common").setNodeValue
@@ -73,6 +70,9 @@ function Transform(dirname) {
     function transform(file, content) {
         console.log(`Build File: [${file}]`);
         var fileName = P.basename(file);
+        if (/\.less$/.test(file) && enableDataUri) {
+            return replaceLess(dirname, file, content)
+        }
         if (match(ignore, fileName)) {
             return content;
         }
@@ -157,7 +157,6 @@ function Transform(dirname) {
         // 保留
         persist = _.concat(persist, list)
     }
-    // var ignore = [/.*\.json$/, /.*\.less$/, /.*\.jpg$/, /.*\.png$/, /.*\.gif$/];
     var ignore = [];
     this.ignore = function(list) {
         // 不处理,比如json, less
@@ -181,6 +180,10 @@ function Transform(dirname) {
     this.enableBase64 = function() {
         enableBase64 = true;
     }
+    var enableDataUri = false;
+    this.enableDataUri = function() {
+        enableDataUri = true;
+    }
     this.output = function() {
         if (transformJade) {
             transformJade.output()
@@ -200,6 +203,7 @@ Transform.build = function(dirname, ignoreList) {
         throw Error("Pack Need [dirname, ignoreList] Args")
     }
     var trans = new Transform(dirname);
+    trans.enableDataUri();
     // 路径展开
     trans.enablePath();
     // base64展开
