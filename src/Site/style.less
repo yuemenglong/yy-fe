@@ -255,18 +255,94 @@ ul {
             width: @_COLUMN_WIDTH;
             display: inline-block;
             vertical-align: top;
+            border: solid 1px #ccc;
             ul.header {
                 .header();
-                border: solid #ccc;
-                border-width: 1 1 0 1;
-                >li {}
             }
-            .body{
+            .body {
                 border-top: 1px solid #ccc;
                 margin-top: -1px;
+                padding: 10px 21px;
+                >ul {
+                    >li {
+                        display: inline-block;
+                        margin: 12px 8px;
+                        position: relative;
+                        >span {
+                            position: absolute;
+                            top: 6px;
+                            left: 32px;
+                        }
+                        >button {
+                            font-size: 16px;
+                            width: 207px;
+                            height: 35px;
+                            background-color: #e0f3ff;
+                            border: 1px solid #ccc;
+                            border-radius: 10px;
+                            color: #444;
+                            outline: none;
+                            &:hover {
+                                color: #c00;
+                                cursor: pointer;
+                            }
+                        }
+                    }
+                }
+                // 相关服务
+                >.xgfw {
+                    margin-top: 10px;
+                    height: 80px;
+                    position: relative;
+                    border: solid 1px #ccc;
+                    background-color: #f1f7fb;
+                    >.float {
+                        position: absolute;
+                        width: 30px;
+                        height: 88px;
+                        color: #fff;
+                        padding: 6px 0 4px 13px;
+                        top: -9px;
+                        left: 15px;
+                        background-color: #0269b6;
+                    }
+                    >ul {
+                        font-size: 14px;
+                        padding: 0 0px 0 89px;
+                        margin: 0 0 0 0;
+                        >li {
+                            padding: 0 0 0 0;
+                            margin: 13px 0 0 29px;
+                            display: inline-block;
+                        }
+                    }
+                }
             }
-            >.r2{
-                
+        }
+        >.right {
+            margin-left: @_COLUMN_MARGIN;
+            display: inline-block;
+            vertical-align: top;
+            border: solid 1px #ccc;
+            width: @_COLUMN_WIDTH;
+            height: 270px;
+            >ul.header {
+                .header();
+            }
+            >.body {
+                height: 231px;
+                margin-top: -1px;
+                border-top: solid 1px #ccc;
+                >img {
+                    width: 270px;
+                    height: 210;
+                    float: left;
+                    margin: 10 10;
+                }
+                >p{
+                    margin-right: 10px;
+                }
+                overflow: hidden;
             }
         }
     }

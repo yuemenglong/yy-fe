@@ -49,10 +49,36 @@ function SiteClass() {
     }
     this.renderBSFW = function() {
         var header = "办事服务";
-        var body = _.times(4).map(function(o, i) {
-            return jade(`li(key={i}) 办事指南`)
-        })
+        var buttons = jade(`ul(key="bsff")`, function() {
+            return _.times(4).map(function(o, i) {
+                return jade(`
+                li(key={i})
+                    span {">>"}
+                    button 办事指南`)
+            })
+        });
+        var body = [buttons, this.renderXGFW()]
         return jade(`NavTab(className="left" header={[header,header]} body={[body,body]})`)
+    }
+    this.renderXGFW = function() {
+        var items = ["行政审批大厅", "问题解答", "下载中心", "行政许可公示", "行政处罚公示"].map(function(item, i) {
+            return jade("li(key={i}) {item}")
+        })
+        return jade(`
+        div(key="xgfw" className="xgfw")
+            div(className="float") 相关服务
+            ul
+                |{items}
+            `)
+    }
+    this.renderZXFT = function() {
+        var header = "在线访谈";
+        var body = [
+            jade(`img(key="img" src="http://www.hncd.gov.cn/portal/rootimages/2017/05/27/1495848788161956.jpg")`),
+            jade(`p 主题： 厅总规划师张宏做客河南政府网“在线访谈”栏目，介绍我省交通运输发展情况`),
+            jade(`p 主题： 厅总规划师张宏做客河南政府网“在线访谈”栏目，介绍我省交通运输发展情况`),
+        ]
+        return jade(`NavTab(className="right" header={[header, header]} body={[body,body]})`)
     }
     this.render = function() {
         return jade(`
@@ -88,6 +114,8 @@ function SiteClass() {
                     |{this.renderImgLinks()}
                 div(className="row4")
                     |{this.renderBSFW()}
+                    |{this.renderZXFT()}
+                    
             `);
     }
 }

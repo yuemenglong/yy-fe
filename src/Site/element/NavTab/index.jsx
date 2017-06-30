@@ -36,9 +36,9 @@ function NavTabClass() {
         }).join(" ");
         return jade(`
         div(id={this.props.id} className={className})
-            ul(className="header")
+            ul(className="yy-nav-tabs-header header")
                 |{this.renderHeaders()}
-            div(className="body")
+            div(className="yy-nav-tabs-body body")
                 |{this.renderBody()}
             `)
     }
