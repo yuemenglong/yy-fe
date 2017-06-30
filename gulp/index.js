@@ -108,11 +108,11 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
         var buildTask = gulp.src(resolve("src/**/*.jsx"))
             .pipe(jadeToJsx())
             .on("error", errorHandler)
-            .pipe(addsrc([resolve("src/**/*.js")]))
+            // .pipe(addsrc([resolve("src/**/*.js")]))
             .pipe(babel({ presets: ['react'] }))
             .pipe(rename({ extname: ".js" }))
+            .pipe(addsrc([resolve("src/**/*.*"), "!" + resolve("src/**/*.jsx")]))
             .pipe(trans.gulp())
-            .pipe(addsrc([resolve("src/**/*.*")]))
             .pipe(gulp.dest(resolve("build")));
         return buildTask;
     }
