@@ -36,8 +36,13 @@ var defaultRequireMap = {
     "util": null,
 }
 
-var defaultClearList = [/\.less$/]; // 需要将require删掉的文件
-var defaultIgnoreList = [/\.json$/, /\.less$/, /\.jpg$/, /\.png$/, /\.gif$/]; // 无需处理的文件
+// 需要将require删掉的文件
+var defaultClearList = [/\.less$/];
+// 无需处理的文件
+var defaultIgnoreList = [/\.json$/, /\.less$/, /\.jpg$/, /\.png$/, /\.gif$/];
+
+var assets = ["js", "json", "less"]
+
 
 function errorHandler(err) {
     console.log(err.stack);
@@ -50,6 +55,7 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
     requireMap = _.merge({}, defaultRequireMap, requireMap);
     clearList = _.concat([], defaultClearList, clearList);
     ignoreList = _.concat([], defaultIgnoreList, ignoreList);
+    assets = assets.map(item => resolve(`src/**/*.${item}`))
 
     function resolve(path) {
         return P.resolve(dirname, path);
@@ -111,7 +117,7 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
             // .pipe(addsrc([resolve("src/**/*.js")]))
             .pipe(babel({ presets: ['react'] }))
             .pipe(rename({ extname: ".js" }))
-            .pipe(addsrc([resolve("src/**/*.*"), "!" + resolve("src/**/*.jsx")]))
+            .pipe(addsrc(assets))
             .pipe(trans.gulp())
             .pipe(gulp.dest(resolve("build")));
         return buildTask;
