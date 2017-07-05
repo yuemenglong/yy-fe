@@ -41,8 +41,7 @@ var defaultClearList = [/\.less$/];
 // 无需处理的文件
 var defaultIgnoreList = [/\.json$/, /\.less$/, /\.jpg$/, /\.png$/, /\.gif$/];
 
-var assets = ["js", "json", "less"]
-
+var defautAssets = ["js", "json", "less"]
 
 function errorHandler(err) {
     console.log(err.stack);
@@ -55,7 +54,8 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
     requireMap = _.merge({}, defaultRequireMap, requireMap);
     clearList = _.concat([], defaultClearList, clearList);
     ignoreList = _.concat([], defaultIgnoreList, ignoreList);
-    assets = assets.map(item => resolve(`src/**/*.${item}`))
+
+    var assets = defautAssets.map(item => resolve(`src/**/*.${item}`))
 
     function resolve(path) {
         return P.resolve(dirname, path);
@@ -198,23 +198,35 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
         var appName = process.argv.slice(-1)[0].slice(2);
         var src = P.resolve(dirname, "build", appName, "bundle.js")
         var dest = P.resolve(dirname, "bundle", appName)
-        var b = browserify(src);
-        var trans = Transform.pack(dirname, appName, requireMap, ignoreList)
-        b.transform(trans.browserify())
+        var globalTrans = null;
+
+        pack();
+
+        function pack() {
+            var b = browserify(src);
+            globalTrans = Transform.pack(dirname, appName, requireMap, ignoreList)
+            b.transform(globalTrans.browserify())
+            b.bundle(startWatch)
+                .pipe(source("bundle.js"))
+                .pipe(buffer())
+                .pipe(gulp.dest(dest))
+                // var buildFiles = trans.getWatchFiles();
+                // var srcFiles = buildFiles.map(function(file) {
+                //     var rel = P.relative(dirname, file).replace(/^build/, "src");
+                //     var abs = P.resolve(dirname, rel)
+                //     if (/\.js$/.test(abs) && !fs.existsSync(abs)) {
+                //         abs += "x"; // convert to jsx
+                //     }
+                //     console.log("[Watch] " + abs)
+                //     return abs;
+                // })
+                // return srcFiles;
+        }
 
         function startWatch() {
-            var buildFiles = trans.getWatchFiles();
-            var srcFiles = buildFiles.map(function(file) {
-                var rel = P.relative(dirname, file).replace(/^build/, "src");
-                var abs = P.resolve(dirname, rel)
-                if (/\.js$/.test(abs) && !fs.existsSync(abs)) {
-                    abs += "x"; // convert to jsx
-                }
-                console.log("[Watch] " + abs)
-                return abs;
-            })
-
-            var srcWatcher = gulp.watch(srcFiles);
+            globalTrans.output()
+            var watches = assets.concat([resolve("src/**/*.jsx")])
+            var srcWatcher = gulp.watch(watches);
             srcWatcher.on("change", onSrcChange)
         }
 
@@ -232,40 +244,51 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
                     .pipe(rename({ extname: ".js" }))
                     .pipe(trans.gulp())
                     .pipe(gulp.dest(output));
-            } else if (P.extname(path) == ".js") {
+            } else {
                 var stm = gulp.src(path).pipe(trans.gulp()).pipe(gulp.dest(output));
-            } else { //less json
-                var stm = gulp.src(path).pipe(gulp.dest(output));
             }
-            stm.on("finish", repack)
-            stm.on("finish", redist.bind(null, path))
+            stm.on("finish", repack.bind(null, path))
         }
 
-        function repack() {
+        function repack(path) {
+            path = /\.jsx$/.test(path) ? path.slice(0, -1) : path
+                // var buildPath = replaceSrc(path, "build")
+                // console.log(watchFiles)
+                // console.log(buildPath)
+            var watchFiles = globalTrans.getWatchFiles();
+            if (watchFiles.indexOf(replaceSrc(path, "build")) < 0) {
+                return
+            }
+
             var src = P.resolve(dirname, "build", appName, "bundle.js")
             var dest = P.resolve(dirname, "bundle", appName)
-            var b = browserify(src);
-            var trans = Transform.pack(dirname, appName, requireMap, ignoreList)
-            b.transform(trans.browserify())
-            return b.bundle(() => trans.output())
+            b = browserify(src);
+            globalTrans = Transform.pack(dirname, appName, requireMap, ignoreList)
+            b.transform(globalTrans.browserify())
+            return b.bundle(finishPack.bind(null, path))
                 .pipe(source("bundle.js"))
                 .pipe(buffer())
                 .pipe(gulp.dest(dest))
         }
 
+        function finishPack(path) {
+            globalTrans.output()
+            redist(path)
+        }
+
         function redist(path) {
-            switch (P.extname(path)) {
-                case ".js":
-                case ".json":
-                    break;
-                case ".less":
-                    return;
-                case ".jsx":
-                    path = path.replace(/jsx$/, "js");
-                    break;
-                default:
-                    throw new Error("Unknown Ext: " + P.extname(path))
-            }
+            // switch (P.extname(path)) {
+            //     case ".js":
+            //     case ".json":
+            //         break;
+            //     case ".less":
+            //         return;
+            //     case ".jsx":
+            //         // path = path.replace(/jsx$/, "js");
+            //         break;
+            //     default:
+            //         throw new Error("Unknown Ext: " + P.extname(path))
+            // }
             var trans = Transform.dist(dirname, clearList, ignoreList)
             var input = replaceSrc(path, "build")
             var output = P.dirname(replaceSrc(path, "dist"))
@@ -280,10 +303,6 @@ module.exports = function(dirname, requireMap, clearList, ignoreList) {
             return `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`;
         }
 
-        b.bundle(startWatch)
-            .pipe(source("bundle.js"))
-            .pipe(buffer())
-            .pipe(gulp.dest(dest))
     }
 
     gulp.task('watch', gulp.series(watchValidate, all, watch));
