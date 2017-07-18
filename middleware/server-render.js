@@ -45,7 +45,7 @@ module.exports = function(dirname, host, port) {
                     } else {
                         logger.error(JSON.stringify(err.stack))
                         // return response.status(500).json({ name: err.name, message: err.message, detail: err.detail });
-                        next(err);
+                        return next(err);
                     }
                 });
             }
