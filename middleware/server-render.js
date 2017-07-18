@@ -15,7 +15,7 @@ module.exports = function(dirname, host, port) {
     var fetchFn = fetchMiddleware.createFetch(host, port);
     // return function(appName, request, response, opt) {
     var serverRender = function(fn, transmit) {
-        return function(request, response) {
+        return function(request, response, next) {
             var render = response.render.bind(response);
             response.render = serverRenderFn;
             fn(request, response)
@@ -44,7 +44,8 @@ module.exports = function(dirname, host, port) {
                         return response.status(404).end();
                     } else {
                         logger.error(JSON.stringify(err.stack))
-                        return response.status(500).json({ name: err.name, message: err.message, detail: err.detail });
+                        // return response.status(500).json({ name: err.name, message: err.message, detail: err.detail });
+                        next(err);
                     }
                 });
             }
