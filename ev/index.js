@@ -3,7 +3,7 @@ var util = require("util");
 
 function createRoot() {
     var ev = new EventEmitterEx();
-    var fetchData = {};
+    var fetchData = {}; // name, url, data, cb
     var window = global.window || {};
 
     ev.createFetch = function() {
@@ -50,6 +50,12 @@ function createRoot() {
             // delete fetchData[name];
             delete fetchData[arguments[i]]
         }
+    }
+    ev.updateFetch= function(name, value){
+        if(!fetchData[name]){
+            throw new Error("No Such Fetch Data When Upate: " + name)
+        }
+        fetchData[name].data = value
     }
 
     ev.getFetchData = function() {
