@@ -53,7 +53,8 @@ module.exports = function(path) {
             var rand = uuid.v4().split("-")[0];
             var ext = P.extname(file.name);
             var fileName = new Buffer(P.basename(file.name, ext)).toString("base64");
-            var id = moment().format("YYYYMMDD-HHmmss-") + rand + "-" + fileName + ext;
+            // var id = moment().format("YYYYMMDD-HHmmss-") + rand + "-" + fileName + ext;
+            var id = moment().format("YYYYMMDD-HHmmss-") + rand + ext;
             var newPath = P.resolve(uploadDir, id); //P.resolve([from],to)把to解析为一个绝对路径
             fs.renameSync(file.path, newPath); //重命名（同步版的rename）
             var ret = `${dir}/${id}`;
