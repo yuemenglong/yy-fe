@@ -27,16 +27,13 @@ function createFetch(host, port) {
             return new Promise(function(resolve, reject) {
                 var key = pair[0];
                 var path = pair[1];
-                var transmit = Transmit(host, port, function(err, body, res) {
+                var transmit = Transmit(host, port, function(err, body) {
                     if (err) {
                         err.detail = key;
-                        return reject(err)
+                        reject(err)
+                    } else {
+                        resolve([key, JSON.parse(body)]);
                     }
-                    if (key == "$init" && res.headers["set-cookie"]) {
-                        // 设置cookie
-                        response.writeHead(res.statusCode, { "set-cookie": res.headers["set-cookie"] });
-                    }
-                    return resolve([key, JSON.parse(body)]);
                 }, { path: path, headers: { "X-Requested-With": "XMLHttpRequest" } });
                 transmit(request, response);
             })

@@ -56,7 +56,7 @@ function Transmit(host, port, fn, opt) {
                     req._originalUrl = opt.path; // 为了打日志 
                     logger.error(formatRes(req, backendRes, body));
                     if (fn) {
-                        return fn(error(body, backendRes.statusCode), null, backendRes);
+                        return fn(error(body, backendRes.statusCode), null);
                     }
                     try {
                         var err = JSON.parse(body);
@@ -74,7 +74,7 @@ function Transmit(host, port, fn, opt) {
                 }
                 // 提供了回调函数
                 if (fn) {
-                    return fn(null, body, backendRes);
+                    return fn(null, body);
                 }
                 // 没有提供回调函数的情况下默认透回去
                 res.writeHead(backendRes.statusCode, backendRes.headers);
